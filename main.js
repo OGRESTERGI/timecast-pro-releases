@@ -300,26 +300,25 @@ function createApplicationMenu() {
                 {
                     label: t.clearAll,
                     accelerator: 'CmdOrCtrl+Shift+Delete',
-                    click: () => {
-                        dialog.showMessageBox(mainWindow, {
-                            type: 'warning',
-                            title: t.clearConfirmTitle,
-                            message: t.clearConfirmMessage,
-                            detail: t.clearConfirmDetail,
-                            buttons: [t.buttonCancel, t.buttonDeleteAll],
-                            defaultId: 0,
-                            cancelId: 0
-                        }).then((result) => {
-                            if (result.response === 1) {
-                                mainWindow.webContents.executeJavaScript(`
+                    click: async () => {
+                        // Use custom dialog instead of Windows native
+                        const message = `${t.clearConfirmMessage}\n\n${t.clearConfirmDetail}`;
+                        const shouldDelete = await showSimpleConfirmDialog(
+                            t.clearConfirmTitle,
+                            message,
+                            t.buttonDeleteAll,
+                            t.buttonCancel
+                        );
+
+                        if (shouldDelete) {
+                            mainWindow.webContents.executeJavaScript(`
     if (typeof clearAllData === 'function') {
         clearAllData();
     } else {
         console.log('clearAllData function not found');
     }
 `);
-                            }
-                        });
+                        }
                     }
                 },
                 { type: 'separator' },
@@ -7144,61 +7143,58 @@ async function checkForUpdatesManually() {
             // Show update dialog
             showUpdateDialog(result);
         } else {
-            // No update available - show notification
+            // No update available - show custom dialog (NOT Windows native)
+            const currentVer = result.currentVersion || app.getVersion();
             const message = currentLanguage === 'en'
-                ? `You are running the latest version (v${result.currentVersion})`
-                : `Έχετε την πιο πρόσφατη έκδοση (v${result.currentVersion})`;
+                ? `You are running the latest version (v${currentVer})`
+                : `Έχετε την πιο πρόσφατη έκδοση (v${currentVer})`;
 
-            dialog.showMessageBox(mainWindow, {
-                type: 'info',
-                title: currentLanguage === 'en' ? 'Up to Date' : 'Ενημερωμένη Έκδοση',
-                message: message,
-                buttons: ['OK']
-            });
+            showCustomDialog(
+                currentLanguage === 'en' ? 'Up to Date' : 'Ενημερωμένη Έκδοση',
+                message,
+                'info'
+            );
         }
     } catch (error) {
         console.error('❌ Update check failed:', error);
-        dialog.showMessageBox(mainWindow, {
-            type: 'error',
-            title: currentLanguage === 'en' ? 'Update Check Failed' : 'Αποτυχία Ελέγχου',
-            message: currentLanguage === 'en'
+        showCustomDialog(
+            currentLanguage === 'en' ? 'Update Check Failed' : 'Αποτυχία Ελέγχου',
+            currentLanguage === 'en'
                 ? 'Could not check for updates. Please try again later.'
                 : 'Αδυναμία ελέγχου ενημερώσεων. Δοκιμάστε ξανά αργότερα.',
-            buttons: ['OK']
-        });
+            'error'
+        );
     }
 }
 
 /**
  * Show update available dialog με changelog
  */
-function showUpdateDialog(updateInfo) {
+async function showUpdateDialog(updateInfo) {
     const isGreek = currentLanguage === 'el';
 
     const title = isGreek ? 'Νέα Έκδοση Διαθέσιμη!' : 'New Version Available!';
     const message = isGreek
-        ? `Η TimeCast™ Pro v${updateInfo.latestVersion} είναι διαθέσιμη!\n\nΤρέχουσα έκδοση: v${updateInfo.currentVersion}\nΝέα έκδοση: v${updateInfo.latestVersion}\n\nΑλλαγές:\n${updateInfo.changelog.substring(0, 300)}...`
-        : `TimeCast™ Pro v${updateInfo.latestVersion} is available!\n\nCurrent version: v${updateInfo.currentVersion}\nNew version: v${updateInfo.latestVersion}\n\nChanges:\n${updateInfo.changelog.substring(0, 300)}...`;
+        ? `Η TimeCast™ Pro v${updateInfo.latestVersion} είναι διαθέσιμη!\n\nΤρέχουσα έκδοση: v${updateInfo.currentVersion}\nΝέα έκδοση: v${updateInfo.latestVersion}\n\n💡 Η άδεια χρήσης σας θα παραμείνει ενεργή στη νέα έκδοση.\n\nΑλλαγές:\n${updateInfo.changelog.substring(0, 200)}...`
+        : `TimeCast™ Pro v${updateInfo.latestVersion} is available!\n\nCurrent version: v${updateInfo.currentVersion}\nNew version: v${updateInfo.latestVersion}\n\n💡 Your license will remain active in the new version.\n\nChanges:\n${updateInfo.changelog.substring(0, 200)}...`;
 
     const downloadBtn = isGreek ? 'Κατέβασμα Ενημέρωσης' : 'Download Update';
     const laterBtn = isGreek ? 'Αργότερα' : 'Later';
 
-    const response = dialog.showMessageBoxSync(mainWindow, {
-        type: 'info',
-        title: title,
-        message: message,
-        detail: isGreek
-            ? '\n💡 Η άδεια χρήσης σας θα παραμείνει ενεργή στη νέα έκδοση.'
-            : '\n💡 Your license will remain active in the new version.',
-        buttons: [downloadBtn, laterBtn],
-        defaultId: 0,
-        cancelId: 1
-    });
+    // Use custom dialog instead of Windows native
+    const shouldDownload = await showSimpleConfirmDialog(title, message, downloadBtn, laterBtn);
 
-    if (response === 0) {
+    if (shouldDownload) {
         // Open download URL in browser
         shell.openExternal(updateInfo.downloadUrl);
     }
+}
+
+// Simple Custom Info Dialog (OK button only)
+function showCustomDialog(title, message, type = 'info') {
+    const confirmText = currentLanguage === 'en' ? 'OK' : 'OK';
+    // No cancel button - pass empty string to hide it
+    return showSimpleConfirmDialog(title, message, confirmText, '');
 }
 
 // Simple Custom Confirm Dialog Function

@@ -215,10 +215,21 @@
             if (data.confirmText) {
                 document.getElementById('confirmBtn').textContent = data.confirmText;
             }
-            if (data.cancelText) {
-                document.getElementById('cancelBtn').textContent = data.cancelText;
+            if (data.cancelText !== undefined) {
+                if (data.cancelText === '') {
+                    // Hide cancel button for info-only dialogs
+                    document.getElementById('cancelBtn').style.display = 'none';
+                    // Change confirm button to green for info dialogs
+                    const confirmBtn = document.getElementById('confirmBtn');
+                    confirmBtn.style.background = '#28a745';
+                    confirmBtn.addEventListener('mouseenter', () => confirmBtn.style.background = '#218838');
+                    confirmBtn.addEventListener('mouseleave', () => confirmBtn.style.background = '#28a745');
+                } else {
+                    document.getElementById('cancelBtn').textContent = data.cancelText;
+                    document.getElementById('cancelBtn').style.display = 'inline-block';
+                }
             }
-            
+
             // Show details for exit confirmation
             if (data.message && data.message.includes('κλείσετε την εφαρμογή')) {
                 document.getElementById('dialogDetails').style.display = 'block';

@@ -11,10 +11,8 @@ console.log(`🔄 Updating version to ${newVersion} in all files...`);
 const filesToUpdate = [
     {
         file: 'splash.html',
-        pattern: /<div class="version">\s*v[\d.]+\s*<\/div>/,
-        replacement: `<div class="version">
-    v${newVersion}
-  </div>`
+        pattern: /(<div class="version">)\s*v[\d.]+\s*(<\/div>)/,
+        replacement: `$1\n    v${newVersion}\n  $2`
     },
     {
         file: 'admin.html', 
@@ -33,8 +31,8 @@ const filesToUpdate = [
     },
     {
         file: 'about-dialog.html',
-        pattern: /v[\d.]+/g,
-        replacement: `v${newVersion}`
+        pattern: /<div class="version" id="version">v[\d.]+<\/div>/,
+        replacement: `<div class="version" id="version">v${newVersion}</div>`
     },
     {
         file: 'gdpr-dialog.html', 
