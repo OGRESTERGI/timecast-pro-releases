@@ -15,6 +15,8 @@ class UpdateChecker {
         this.lastCheck = null;
         this.updateAvailable = false;
         this.latestRelease = null;
+        // GitHub Personal Access Token για private repo access
+        this.githubToken = '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';
     }
 
     /**
@@ -25,18 +27,19 @@ class UpdateChecker {
         return new Promise((resolve, reject) => {
             const options = {
                 hostname: 'api.github.com',
-                path: `/repos/${this.githubRepo}/releases/latest`,
+                path: `/repos/${this.githubRepo}/releases`,
                 method: 'GET',
                 headers: {
                     'User-Agent': `TimeCast-Pro/${this.currentVersion}`,
-                    'Accept': 'application/vnd.github.v3+json'
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': `token ${this.githubToken}`
                 },
                 timeout: 10000 // 10 second timeout
             };
 
             console.log('🔍 Checking for updates...');
             console.log(`   Current version: ${this.currentVersion}`);
-            console.log(`   GitHub API: https://api.github.com/repos/${this.githubRepo}/releases/latest`);
+            console.log(`   GitHub API: https://api.github.com/repos/${this.githubRepo}/releases`);
 
             const req = https.request(options, (res) => {
                 let data = '';
@@ -87,11 +90,29 @@ class UpdateChecker {
                             return;
                         }
 
-                        const release = JSON.parse(data);
+                        const releases = JSON.parse(data);
+                        console.log(`   ✅ Found ${releases.length} total releases`);
+
+                        // Filter for non-prerelease, non-draft releases
+                        const stableReleases = releases.filter(r => !r.prerelease && !r.draft);
+                        console.log(`   📦 Stable releases: ${stableReleases.length}`);
+
+                        if (stableReleases.length === 0) {
+                            console.log('ℹ️  No stable releases found');
+                            resolve({
+                                updateAvailable: false,
+                                currentVersion: this.currentVersion,
+                                message: 'No stable releases available yet'
+                            });
+                            return;
+                        }
+
+                        // Get the first stable release (latest)
+                        const release = stableReleases[0];
                         this.latestRelease = release;
                         this.lastCheck = Date.now();
 
-                        console.log(`   ✅ Release found: ${release.tag_name}`);
+                        console.log(`   ✅ Latest stable release: ${release.tag_name}`);
                         console.log(`   Published: ${release.published_at}`);
                         console.log(`   Prerelease: ${release.prerelease}`);
                         console.log(`   Draft: ${release.draft}`);
