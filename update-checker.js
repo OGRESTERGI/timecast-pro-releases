@@ -30,14 +30,19 @@ class UpdateChecker {
                 headers: {
                     'User-Agent': `TimeCast-Pro/${this.currentVersion}`,
                     'Accept': 'application/vnd.github.v3+json'
-                }
+                },
+                timeout: 10000 // 10 second timeout
             };
 
             console.log('🔍 Checking for updates...');
             console.log(`   Current version: ${this.currentVersion}`);
+            console.log(`   GitHub API: https://api.github.com/repos/${this.githubRepo}/releases/latest`);
 
             const req = https.request(options, (res) => {
                 let data = '';
+
+                console.log(`   Response status: ${res.statusCode}`);
+                console.log(`   Response headers:`, res.headers);
 
                 res.on('data', (chunk) => {
                     data += chunk;
@@ -45,40 +50,72 @@ class UpdateChecker {
 
                 res.on('end', () => {
                     try {
-                        if (res.statusCode === 404) {
-                            console.log('ℹ️  No releases found on GitHub');
+                        // Handle rate limiting
+                        if (res.statusCode === 403) {
+                            const rateLimitRemaining = res.headers['x-ratelimit-remaining'];
+                            const rateLimitReset = res.headers['x-ratelimit-reset'];
+                            console.error(`❌ GitHub API rate limit exceeded!`);
+                            console.error(`   Remaining: ${rateLimitRemaining}`);
+                            console.error(`   Reset at: ${new Date(rateLimitReset * 1000).toLocaleString()}`);
                             resolve({
                                 updateAvailable: false,
+                                currentVersion: this.currentVersion,
+                                error: 'Rate limit exceeded. Try again later.'
+                            });
+                            return;
+                        }
+
+                        if (res.statusCode === 404) {
+                            console.log('ℹ️  No releases found on GitHub');
+                            console.log(`   Response body: ${data.substring(0, 200)}`);
+                            resolve({
+                                updateAvailable: false,
+                                currentVersion: this.currentVersion,
                                 message: 'No releases available yet'
                             });
                             return;
                         }
 
                         if (res.statusCode !== 200) {
-                            throw new Error(`GitHub API returned ${res.statusCode}`);
+                            console.error(`❌ GitHub API error: ${res.statusCode}`);
+                            console.error(`   Response body: ${data.substring(0, 500)}`);
+                            resolve({
+                                updateAvailable: false,
+                                currentVersion: this.currentVersion,
+                                error: `API error: ${res.statusCode}`
+                            });
+                            return;
                         }
 
                         const release = JSON.parse(data);
                         this.latestRelease = release;
                         this.lastCheck = Date.now();
 
+                        console.log(`   ✅ Release found: ${release.tag_name}`);
+                        console.log(`   Published: ${release.published_at}`);
+                        console.log(`   Prerelease: ${release.prerelease}`);
+                        console.log(`   Draft: ${release.draft}`);
+
                         // Parse versions (remove 'v' prefix if exists)
                         const latestVersion = release.tag_name.replace(/^v/, '');
                         const currentVersion = this.currentVersion.replace(/^v/, '');
 
                         console.log(`   Latest version: ${latestVersion}`);
+                        console.log(`   Comparing: ${currentVersion} vs ${latestVersion}`);
 
                         // Compare versions
                         const updateAvailable = this.isNewerVersion(latestVersion, currentVersion);
                         this.updateAvailable = updateAvailable;
 
                         if (updateAvailable) {
-                            console.log('✅ Update available!');
+                            console.log('🎉 Update available!');
 
                             // Find .exe download URL
                             const exeAsset = release.assets.find(asset =>
                                 asset.name.endsWith('.exe')
                             );
+
+                            console.log(`   Download URL: ${exeAsset ? exeAsset.browser_download_url : 'N/A'}`);
 
                             resolve({
                                 updateAvailable: true,
@@ -90,7 +127,7 @@ class UpdateChecker {
                                 releasePage: release.html_url
                             });
                         } else {
-                            console.log('ℹ️  Already up to date');
+                            console.log('ℹ️  Already up to date (no newer version found)');
                             resolve({
                                 updateAvailable: false,
                                 currentVersion: currentVersion,
@@ -100,14 +137,35 @@ class UpdateChecker {
 
                     } catch (error) {
                         console.error('❌ Error parsing GitHub response:', error);
-                        reject(error);
+                        console.error(`   Raw data: ${data.substring(0, 500)}`);
+                        resolve({
+                            updateAvailable: false,
+                            currentVersion: this.currentVersion,
+                            error: error.message
+                        });
                     }
                 });
             });
 
             req.on('error', (error) => {
-                console.error('❌ Error checking for updates:', error);
-                reject(error);
+                console.error('❌ Network error checking for updates:', error.message);
+                console.error('   Code:', error.code);
+                console.error('   Syscall:', error.syscall);
+                resolve({
+                    updateAvailable: false,
+                    currentVersion: this.currentVersion,
+                    error: `Network error: ${error.message}`
+                });
+            });
+
+            req.on('timeout', () => {
+                console.error('❌ Update check timeout (10s exceeded)');
+                req.destroy();
+                resolve({
+                    updateAvailable: false,
+                    currentVersion: this.currentVersion,
+                    error: 'Request timeout'
+                });
             });
 
             req.end();
