@@ -1,0 +1,108 @@
+{
+  "name": "sovereign-event-timer",
+  "version": "6.7.0",
+  "description": "TimeCast® Pro Professional Conference Timer System by Sovereign Event Systems",
+  "main": "main.js",
+  "homepage": "./www.sovereign.gr",
+  "copyright": "© 2025 Sovereign Event Systems. All rights reserved.",
+  "scripts": {
+    "start": "node server.js",
+    "electron": "electron .",
+    "electron-dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version",
+    "version:major": "npm version major --no-git-tag-version",
+    "build:patch": "npm run version:patch && npm run update-version-files && npm run build",
+    "build:minor": "npm run version:minor && npm run update-version-files && npm run build",
+    "build:major": "npm run version:major && npm run update-version-files && npm run build",
+    "update-version-files": "node update-version.js"
+  },
+  "build": {
+    "appId": "com.sovereign.conference-timer",
+    "productName": "TimeCast® Pro Conference Timer",
+    "icon": "assets/icon.ico",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "nsis": {
+      "unicode": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "useZip": true
+    },
+    "files": [
+      "*.js",
+      "*.html",
+      "*.css",
+      "*.json",
+      "*.md",
+      "assets/**/*",
+      "libs/**/*",
+      "locales/**/*",
+      "companion-modules/**/*",
+      "!test-*.js",
+      "!telnet-*.js",
+      "!yeelight-integration.js",
+      "!yeelightlamps.js",
+      "!*.backup",
+      "!reset-trial.ps1",
+      "!node_modules/electron*/**/*",
+      "!dist/**/*",
+      "!backups/**/*",
+      "!obsolete-files/**/*",
+      "!C:temptimer2_build/**/*"
+    ],
+    "asarUnpack": [
+      "server.js",
+      "admin.html",
+      "timer.html",
+      "error.html",
+      "splash.html",
+      "lcdstrip.html",
+      "grace-period-dialog.html",
+      "trial-expired-dialog.html",
+      "companion-api.js",
+      "questions-api.js",
+      "libs/**/*",
+      "node_modules/express/**/*",
+      "node_modules/socket.io/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "TimeCast Pro ConferenceTimer-v${version}.exe"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "author": "Sovereign Event Systems",
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "i18next": "^25.3.4",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-fs-backend": "^2.6.0",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.7.0",
+    "papaparse": "^5.5.3",
+    "socket.io": "^4.7.0",
+    "xlsx": "^0.18.5",
+    "xml2js": "^0.6.2"
+  }
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title" data-ns="errors">Προειδοποίηση HDMI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .dialog-container {
+            background: #2c3e50;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .warning-icon {
+            font-size: 2.5rem;
+            color: #ff8c00;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .dialog-title {
+            margin: 0 0 15px 0;
+            color: #ff8c00;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .dialog-message {
+            margin: 0 0 15px 0;
+            color: white;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .detail-text {
+            margin: 10px 0 25px 0;
+            color: #bdc3c7;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            color: black;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Language switcher -->
+    <select class="language-switcher" id="language-switcher">
+        <option value="el">🇬🇷 Ελληνικά</option>
+        <option value="en">🇬🇧 English</option>
+    </select>
+
+    <div class="dialog-container">
+        <span class="warning-icon">⚠️</span>
+        <h3 class="dialog-title" data-i18n="title" data-ns="errors">Προειδοποίηση HDMI</h3>
+        <p class="dialog-message" data-i18n="hdmi.noSecondDisplay" data-ns="errors">Δεν έχει συνδεθεί δεύτερη οθόνη!</p>
+        <div class="detail-text">
+            <span data-i18n="detail" data-ns="errors">Συνδέστε μια δεύτερη οθόνη (HDMI/DisplayPort/USB-C) και δοκιμάστε ξανά.</span>
+        </div>
+        
+        <div class="dialog-buttons">
+            <button class="btn btn-primary" onclick="closeDialog('ok')" data-i18n="ok" data-ns="common">
+                Εντάξει
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Load i18n system for demonstration
+        const i18next = require('i18next');
+        const Backend = require('i18next-fs-backend');
+
+        // Initialize i18n
+        async function initializeI18n() {
+            try {
+                await i18next
+                    .use(Backend)
+                    .init({
+                        lng: 'el', // Default Greek
+                        fallbackLng: 'el',
+                        ns: ['common', 'errors'],
+                        defaultNS: 'common',
+                        backend: {
+                            loadPath: './locales/{{lng}}/{{ns}}.json'
+                        }
+                    });
+
+                console.log('✅ i18next initialized for HDMI dialog');
+                updateTexts();
+                setupLanguageSwitcher();
+                
+            } catch (error) {
+                console.error('❌ Failed to initialize i18n:', error);
+                // Fallback to existing static text
+            }
+        }
+
+        // Update all text elements
+        function updateTexts() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const namespace = element.getAttribute('data-ns') || 'common';
+                const fullKey = `${namespace}:${key}`;
+                
+                try {
+                    const translation = i18next.t(fullKey);
+                    element.textContent = translation;
+                } catch (error) {
+                    console.warn(`Translation not found: ${fullKey}`);
+                    // Keep existing text as fallback
+                }
+            });
+        }
+
+        // Setup language switcher
+        function setupLanguageSwitcher() {
+            const switcher = document.getElementById('language-switcher');
+            switcher.value = i18next.language || 'el';
+            
+            switcher.addEventListener('change', async (e) => {
+                console.log(`🔄 Switching to language: ${e.target.value}`);
+                
+                try {
+                    await i18next.changeLanguage(e.target.value);
+                    updateTexts();
+                    console.log(`✅ Language changed to: ${e.target.value}`);
+                } catch (error) {
+                    console.error('❌ Failed to change language:', error);
+                }
+            });
+        }
+
+        // Close dialog (same as original)
+        function closeDialog(result) {
+            console.log('Dialog closed with result:', result);
+            
+            if (typeof require !== 'undefined') {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.send('dialog-result', result);
+            }
+        }
+
+        // ESC key support
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeDialog('cancel');
+            }
+        });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🌐 Initializing i18n HDMI dialog...');
+            initializeI18n();
+            
+            // Focus the OK button
+            document.querySelector('.btn-primary').focus();
+        });
+    </script>
+</body>
+</html>

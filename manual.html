@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conference Timer - Εγχειρίδιο Χρήσης</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .nav-menu {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .nav-menu h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h4 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin: 20px 0 10px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 5px solid var(--secondary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .step-list ol {
+            margin-left: 20px;
+        }
+
+        .step-list li {
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .step-list strong {
+            color: var(--primary-color);
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid var(--warning-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--warning-color);
+        }
+
+        .warning-box h4 {
+            color: var(--warning-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .tip-box h4 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .controls-table th,
+        .controls-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .controls-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .controls-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .keyboard-key {
+            background: #2c3e50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .button-demo {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            margin: 5px;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .button-demo:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-start { background: var(--success-color); }
+        .btn-pause { background: var(--warning-color); }
+        .btn-reset { background: var(--accent-color); }
+        .btn-adjust { background: var(--secondary-color); }
+
+        .screenshot-placeholder {
+            background: #e9ecef;
+            border: 2px dashed #adb5bd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            color: #6c757d;
+        }
+
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .header p { font-size: 1rem; }
+            .content { padding: 20px; }
+            .nav-links { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📺 Conference Timer</h1>
+            <p>Επαγγελματικό σύστημα χρονομέτρησης για παρουσιάσεις και εκδηλώσεις</p>
+            <div class="version-badge">Έκδοση 2.0</div>
+        </div>
+
+        <div class="content">
+            <!-- Πλοήγηση -->
+            <div class="nav-menu">
+                <h3>📚 Περιεχόμενα</h3>
+                <div class="nav-links">
+                    <a href="#overview">🎯 Επισκόπηση</a>
+                    <a href="#installation">💿 Εγκατάσταση</a>
+                    <a href="#getting-started">🚀 Πρώτα Βήματα</a>
+                    <a href="#admin-panel">⚙️ Admin Panel</a>
+                    <a href="#timer-display">📺 Timer Display</a>
+                    <a href="#features">✨ Χαρακτηριστικά</a>
+                    <a href="#shortcuts">⌨️ Συντομεύσεις</a>
+                    <a href="#troubleshooting">🔧 Αντιμετώπιση Προβλημάτων</a>
+                </div>
+            </div>
+
+            <!-- Επισκόπηση -->
+            <section class="section" id="overview">
+                <h2>🎯 Επισκόπηση</h2>
+                <p>Το Conference Timer είναι ένα επαγγελματικό σύστημα χρονομέτρησης που σχεδιάστηκε ειδικά για παρουσιάσεις, συνέδρια και εκδηλώσεις. Προσφέρει:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>⏰ Ακριβής Χρονομέτρηση</h4>
+                        <p>Χρονομέτρηση σε πραγματικό χρόνο με υπερπρογραμματισμό (overtime) για την παρακολούθηση παρατάσεων.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📱 Πολλαπλές Συσκευές</h4>
+                        <p>Έλεγχος από tablet, smartphone ή laptop με real-time συγχρονισμό μεταξύ όλων των συσκευών.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📺 Professional Display</h4>
+                        <p>Καθαρή, ευανάγνωστη εμφάνιση με υποστήριξη fullscreen και προσαρμοστικό μέγεθος γραμματοσειράς.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🎨 Προσαρμοσιμότητα</h4>
+                        <p>Λογότυπα, χρώματα, τίτλοι και μηνύματα πλήρως προσαρμόσιμα για τις ανάγκες σας.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📡 Live Event Timeline</h4>
+                        <p>Διαχείριση χρονοδιαγράμματος εκδηλώσεων με event markers και real-time tracking.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔊 Ηχητικές Ειδοποιήσεις</h4>
+                        <p>Προσαρμόσιμοι ήχοι για προειδοποιήσεις και λήξη χρόνου.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Εγκατάσταση -->
+            <section class="section" id="installation">
+                <h2>💿 Εγκατάσταση</h2>
+                
+                <h3>🖥️ Desktop Application (Συνιστάται)</h3>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Κατεβάστε</strong> το αρχείο <code>timer.exe</code> από τον φάκελο του έργου</li>
+                        <li><strong>Εκτελέστε</strong> το αρχείο ως διαχειριστής (right-click → "Run as administrator")</li>
+                        <li><strong>Περιμένετε</strong> 4-5 δευτερόλεπτα για την εκκίνηση του embedded server</li>
+                        <li><strong>Το Admin Panel θα ανοίξει αυτόματα</strong> στον browser σας</li>
+                    </ol>
+                </div>
+
+                <h3>🌐 Web Browser (Εναλλακτικά)</h3>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Εκτελέστε</strong> το <code>server.js</code> με Node.js</li>
+                        <li><strong>Ανοίξτε</strong> browser και πηγαίνετε στο <code>http://localhost:3000</code></li>
+                        <li><strong>Θα ανακατευθυνθείτε</strong> αυτόματα στο Admin Panel</li>
+                    </ol>
+                </div>
+
+                <div class="tip-box">
+                    <h4>💡 Συμβουλή</h4>
+                    <p>Η desktop εφαρμογή περιλαμβάνει όλες τις δυνατότητες συμπεριλαμβανομένου του HDMI timer display για δεύτερη οθόνη!</p>
+                </div>
+            </section>
+
+            <!-- Πρώτα Βήματα -->
+            <section class="section" id="getting-started">
+                <h2>🚀 Πρώτα Βήματα</h2>
+                
+                <h3>⚙️ Βασική Ρύθμιση</h3>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Ορίστε τον χρόνο:</strong> Στο μπλε πλαίσιο, εισάγετε ΩΡ:ΛΕΠ:ΔΕΥ και Προειδοποίηση</li>
+                        <li><strong>Πατήστε "Εφαρμογή"</strong> για να ενημερωθεί ο χρονομετρητής</li>
+                        <li><strong>Προσαρμόστε τον τίτλο:</strong> Εισάγετε τον τίτλο της παρουσίασής σας</li>
+                        <li><strong>Ελέγξτε την προεπισκόπηση:</strong> Βεβαιωθείτε ότι όλα φαίνονται σωστά</li>
+                    </ol>
+                </div>
+
+                <h3>▶️ Εκκίνηση Παρουσίασης</h3>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Ανοίξτε το Timer Display:</strong> Κλικ στο κουμπί "🖥️ Timer HDMI" για δεύτερη οθόνη</li>
+                        <li><strong>Πατήστε "Έναρξη"</strong> για να ξεκινήσει η αντίστροφη μέτρηση</li>
+                        <li><strong>Παρακολουθήστε:</strong> Το χρώμα αλλάζει σε πορτοκαλί (προειδοποίηση) και κόκκινο (λήξη)</li>
+                        <li><strong>Χρησιμοποιήστε τα κουμπιά +/-</strong> για προσαρμογές κατά τη διάρκεια</li>
+                    </ol>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ Σημαντικό</h4>
+                    <p>Για βέλτιστη εμπειρία, χρησιμοποιήστε δεύτερη οθόνη (HDMI/DisplayPort) για το timer display και κρατήστε το admin panel στην κύρια οθόνη σας.</p>
+                </div>
+            </section>
+
+            <!-- Admin Panel -->
+            <section class="section" id="admin-panel">
+                <h2>⚙️ Admin Panel</h2>
+                
+                <h3>🎛️ Κύρια Χειριστήρια</h3>
+                
+                <h4>⏰ Ρυθμίσεις Χρονομέτρου</h4>
+                <p>Το μπλε πλαίσιο στο πάνω μέρος περιλαμβάνει:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>ΩΡ/ΛΕΠ/ΔΕΥ:</strong> Ορισμός χρόνου παρουσίασης</li>
+                    <li><strong>Προειδοποίηση:</strong> Χρόνος σε δευτερόλεπτα για την πορτοκαλί προειδοποίηση</li>
+                    <li><strong>Κουμπί Εφαρμογή:</strong> Ενημέρωση των ρυθμίσεων</li>
+                </ul>
+
+                <h4>🎮 Χειριστήρια Timer</h4>
+                <p>Κάτω από την προεπισκόπηση:</p>
+                <div style="margin: 15px 0;">
+                    <span class="button-demo btn-adjust">-10m</span>
+                    <span class="button-demo btn-adjust">-5m</span>
+                    <span class="button-demo btn-adjust">-1m</span>
+                    <span class="button-demo btn-start">Έναρξη</span>
+                    <span class="button-demo btn-pause">Παύση</span>
+                    <span class="button-demo btn-reset">Επαναφορά</span>
+                    <span class="button-demo btn-adjust">+1m</span>
+                    <span class="button-demo btn-adjust">+5m</span>
+                    <span class="button-demo btn-adjust">+10m</span>
+                </div>
+
+                <h3>💬 Διαχείριση Μηνυμάτων</h3>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Γράψτε μήνυμα</strong> στο κουτί κειμένου</li>
+                        <li><strong>Επιλέξτε:</strong>
+                            <ul style="margin-top: 10px;">
+                                <li><strong>Ενημέρωση Μηνύματος:</strong> Στέλνει το μήνυμα στην οθόνη</li>
+                                <li><strong>Απόκρυψη/Αποστολή:</strong> Εναλλαγή ορατότητας</li>
+                            </ul>
+                        </li>
+                        <li><strong>Αποθήκευση:</strong> Κλικ "Αποθήκευση Μηνύματος" για μελλοντική χρήση</li>
+                        <li><strong>Flash Μήνυμα:</strong> Κάνει το μήνυμα να αναβοσβήνει για προσοχή</li>
+                    </ol>
+                </div>
+
+                <h3>📡 Live Event Timeline</h3>
+                <p>Η δεξιά πλευρά του admin panel εμφανίζει:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Τρέχον Γεγονός:</strong> Ποιο event εκτελείται τώρα</li>
+                    <li><strong>Επόμενο Γεγονός:</strong> Το αμέσως επόμενο event</li>
+                    <li><strong>Μεθεπόμενο:</strong> Το event που ακολουθεί</li>
+                    <li><strong>Συνδεδεμένες Συσκευές:</strong> Ποιες συσκευές είναι online</li>
+                </ul>
+            </section>
+
+            <!-- Timer Display -->
+            <section class="section" id="timer-display">
+                <h2>📺 Timer Display</h2>
+                
+                <h3>🖼️ Στοιχεία Οθόνης</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>📝 Τίτλος</h4>
+                        <p>Εμφανίζεται στο πάνω μέρος. Προσαρμόζει αυτόματα το μέγεθός του βάσει του μήκους.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⏱️ Χρονομετρητής</h4>
+                        <p>Κεντρικά στην οθόνη. Αλλάζει χρώμα: Λευκό → Πορτοκαλί → Κόκκινο → Κόκκινο αναβοσβήνων (overtime).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Progress Bar</h4>
+                        <p>Κάτω από τον χρονομετρητή. Εμφανίζει γραφικά τον υπολειπόμενο χρόνο.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>💬 Μηνύματα</h4>
+                        <p>Εμφανίζονται κάτω. Προσαρμόζουν αυτόματα το μέγεθος και μπορούν να αναβοσβήνουν.</p>
+                    </div>
+                </div>
+
+                <h3>🎨 Προσαρμογές Εμφάνισης</h3>
+                <p>Από το Admin Panel μπορείτε να προσαρμόσετε:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Λογότυπα:</strong> Έως 6 θέσεις (γωνίες + κέντρα πλευρών)</li>
+                    <li><strong>Χρώματα φόντου:</strong> Επιλογή από παλέτα ή HEX κώδικα</li>
+                    <li><strong>Μέγεθος τίτλου:</strong> Κουμπιά +/- για προσαρμογή</li>
+                    <li><strong>Μέγεθος λογότυπων:</strong> Προσαρμοστικό μέγεθος</li>
+                </ul>
+
+                <h3>⌨️ Συντομεύσεις Πλήκτρων (Timer Display)</h3>
+                <table class="controls-table">
+                    <thead>
+                        <tr>
+                            <th>Πλήκτρο</th>
+                            <th>Λειτουργία</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-key">Double-Click</span></td>
+                            <td>Εναλλαγή Fullscreen</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">ESC</span></td>
+                            <td>Έξοδος από Fullscreen</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">F11</span></td>
+                            <td>Εναλλαγή Fullscreen</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Χαρακτηριστικά -->
+            <section class="section" id="features">
+                <h2>✨ Προηγμένα Χαρακτηριστικά</h2>
+                
+                <h3>📱 Πολλαπλές Συσκευές</h3>
+                <p>Συνδέστε tablet, smartphone ή laptop στο ίδιο WiFi δίκτυο:</p>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Σαρώστε το QR Code</strong> που εμφανίζεται στο admin panel</li>
+                        <li><strong>Ή χρησιμοποιήστε τις IP διευθύνσεις</strong> που εμφανίζονται</li>
+                        <li><strong>Όλες οι συσκευές συγχρονίζονται</strong> αυτόματα σε πραγματικό χρόνο</li>
+                    </ol>
+                </div>
+
+                <h3>🎵 Ηχητικές Ειδοποιήσεις</h3>
+                <p>Το σύστημα παίζει διαφορετικούς ήχους:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Προειδοποίηση:</strong> Ήχος όταν φτάνει στον χρόνο προειδοποίησης</li>
+                    <li><strong>Τέλος χρόνου:</strong> Διαφορετικός ήχος στο 00:00</li>
+                    <li><strong>Ρύθμιση έντασης:</strong> Από τις ρυθμίσεις (0-100%)</li>
+                    <li><strong>Απενεργοποίηση:</strong> Checkbox για πλήρη σίγαση</li>
+                </ul>
+
+                <h3>⚡ Flash Alert</h3>
+                <p>Κάνει την οθόνη να αναβοσβήνει για έκτακτες ανακοινώσεις:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Manual Flash:</strong> 3 φορές και σταματάει</li>
+                    <li><strong>Συνδυασμός με μήνυμα:</strong> Αναβοσβήνει μαζί με το κείμενο</li>
+                    <li><strong>Άμεση διακοπή:</strong> Κουμπί "Διακοπή Flash"</li>
+                </ul>
+
+                <h3>📅 Event Timeline</h3>
+                <p>Διαχειριστείτε το πρόγραμμα της εκδήλωσής σας:</p>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Ορίστε χρονοσειρά:</strong> Στις ρυθμίσεις, βάλτε ώρα έναρξης και λήξης</li>
+                        <li><strong>Προσθέστε events:</strong> Κλικ στη timeline bar για νέο marker</li>
+                        <li><strong>Επεξεργασία:</strong> Double-click σε marker για αλλαγή τίτλου</li>
+                        <li><strong>Διαγραφή:</strong> Right-click σε marker για διαγραφή</li>
+                        <li><strong>Live tracking:</strong> Η κόκκινη γραμμή δείχνει "τώρα"</li>
+                    </ol>
+                </div>
+
+                <h3>💾 Αποθήκευση & Επαναφορά</h3>
+                <p>Το σύστημα αποθηκεύει αυτόματα όλες τις ρυθμίσεις:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Auto-save:</strong> Κάθε αλλαγή αποθηκεύεται αμέσως</li>
+                    <li><strong>Export/Import:</strong> Αποθήκευση σε αρχείο JSON</li>
+                    <li><strong>Clear All Data:</strong> Επαναφορά στις προεπιλογές</li>
+                    <li><strong>Προφίλ εκδηλώσεων:</strong> Αποθήκευση διαφορετικών configurations</li>
+                </ul>
+            </section>
+
+            <!-- Συντομεύσεις -->
+            <section class="section" id="shortcuts">
+                <h2>⌨️ Συντομεύσεις Πλήκτρων</h2>
+                
+                <h3>🖥️ Admin Panel</h3>
+                <table class="controls-table">
+                    <thead>
+                        <tr>
+                            <th>Συντόμευση</th>
+                            <th>Λειτουργία</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-key">Space</span></td>
+                            <td>Start/Pause Timer</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">R</span></td>
+                            <td>Reset Timer</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">F</span></td>
+                            <td>Flash Alert</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">M</span></td>
+                            <td>Toggle Message Visibility</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">⛶ Button</span></td>
+                            <td>Admin Fullscreen Toggle</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>📺 Timer Display</h3>
+                <table class="controls-table">
+                    <thead>
+                        <tr>
+                            <th>Συντόμευση</th>
+                            <th>Λειτουργία</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-key">Double-Click</span></td>
+                            <td>Fullscreen On/Off</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">ESC</span></td>
+                            <td>Exit Fullscreen</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-key">F11</span></td>
+                            <td>Toggle Fullscreen</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🎮 Stream Deck Integration</h3>
+                <p>Το Conference Timer υποστηρίζει Stream Deck μέσω HTTP requests:</p>
+                <div class="code-block">
+POST /api/timer/start     - Εκκίνηση timer
+POST /api/timer/pause     - Παύση timer  
+POST /api/timer/reset     - Επαναφορά timer
+POST /api/timer/adjust/60 - Προσθήκη 60 δευτερολέπτων
+POST /api/message         - Αποστολή μηνύματος
+                </div>
+            </section>
+
+            <!-- Αντιμετώπιση Προβλημάτων -->
+            <section class="section" id="troubleshooting">
+                <h2>🔧 Αντιμετώπιση Προβλημάτων</h2>
+                
+                <h3>🚫 Συνήθη Προβλήματα</h3>
+                
+                <h4>❌ Δεν ανοίγει το Admin Panel</h4>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Περιμένετε 5 δευτερόλεπτα</strong> μετά την εκκίνηση του timer.exe</li>
+                        <li><strong>Ελέγξτε το firewall:</strong> Επιτρέψτε την εφαρμογή</li>
+                        <li><strong>Δοκιμάστε χειροκίνητα:</strong> Ανοίξτε browser στο <code>http://localhost:3000</code></li>
+                        <li><strong>Restart:</strong> Κλείστε και ξανανοίξτε την εφαρμογή</li>
+                    </ol>
+                </div>
+
+                <h4>📱 Δεν συνδέονται άλλες συσκευές</h4>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Ίδιο WiFi:</strong> Βεβαιωθείτε ότι όλες οι συσκευές είναι στο ίδιο δίκτυο</li>
+                        <li><strong>Ελέγξτε IP:</strong> Χρησιμοποιήστε τις διευθύνσεις από το "📱 Συνδεδεμένες Συσκευές"</li>
+                        <li><strong>Firewall:</strong> Προσωρινά απενεργοποιήστε το firewall για δοκιμή</li>
+                        <li><strong>Port 3000:</strong> Βεβαιωθείτε ότι δεν χρησιμοποιείται από άλλη εφαρμογή</li>
+                    </ol>
+                </div>
+
+                <h4>🖥️ Δεν λειτουργεί το HDMI Timer</h4>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Συνδέστε δεύτερη οθόνη</strong> πριν πατήσετε το κουμπί</li>
+                        <li><strong>Windows Display Settings:</strong> Ρυθμίστε σε "Extend" όχι "Duplicate"</li>
+                        <li><strong>Δοκιμάστε διαφορετικό cable</strong> (HDMI/DisplayPort/USB-C)</li>
+                        <li><strong>Restart:</strong> Κλείστε εφαρμογή, συνδέστε οθόνη, ξανανοίξτε</li>
+                    </ol>
+                </div>
+
+                <h4>🔇 Δεν παίζουν οι ήχοι</h4>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Ελέγξτε ρυθμίσεις:</strong> Sound Enabled ✓ και Volume > 0</li>
+                        <li><strong>Browser permissions:</strong> Επιτρέψτε ήχο στον browser</li>
+                        <li><strong>System volume:</strong> Ελέγξτε την ένταση του συστήματος</li>
+                        <li><strong>Refresh:</strong> Ανανεώστε τη σελίδα του timer display</li>
+                    </ol>
+                </div>
+
+                <h3>⚡ Performance Tips</h3>
+                <div class="tip-box">
+                    <h4>💡 Για βέλτιστη απόδοση</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Κλείστε άλλες εφαρμογές</strong> που τρέχουν στο background</li>
+                        <li><strong>Χρησιμοποιήστε Chrome ή Edge</strong> για καλύτερη συμβατότητα</li>
+                        <li><strong>Ελέγξτε τη σύνδεση WiFi</strong> σε επιστημονικά/εταιρικά δίκτυα</li>
+                        <li><strong>Κρατήστε το laptop στο charger</strong> κατά τη διάρκεια χρήσης</li>
+                    </ul>
+                </div>
+
+                <h3>🆘 Επείγουσες Καταστάσεις</h3>
+                
+                <h4>🚨 Κρέμασμα κατά τη διάρκεια παρουσίασης</h4>
+                <div class="warning-box">
+                    <h4>⚠️ Emergency Backup Plan</h4>
+                    <ol style="margin-left: 20px;">
+                        <li><strong>Άμεση λύση:</strong> Χρησιμοποιήστε το ρολόι του smartphone σας</li>
+                        <li><strong>Quick restart:</strong> Κλείστε εφαρμογή, ξανανοίξτε, πατήστε Reset</li>
+                        <li><strong>Fallback timer:</strong> Χρησιμοποιήστε το built-in Windows timer</li>
+                        <li><strong>Συνεχίστε την παρουσίαση:</strong> Μην διακόψετε τη ροή για τεχνικά προβλήματα</li>
+                    </ol>
+                </div>
+
+                <h3>📞 Τεχνική Υποστήριξη</h3>
+                <div class="tip-box">
+                    <h4>🔍 Πληροφορίες Διάγνωσης</h4>
+                    <p>Αν χρειαστείτε βοήθεια, συλλέξτε αυτές τις πληροφορίες:</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Έκδοση εφαρμογής:</strong> 2.0</li>
+                        <li><strong>Λειτουργικό σύστημα:</strong> Windows 10/11</li>
+                        <li><strong>Browser:</strong> Chrome/Edge/Firefox</li>
+                        <li><strong>Error messages:</strong> Screenshot από F12 Developer Tools</li>
+                        <li><strong>Περιγραφή προβλήματος:</strong> Τι προσπαθούσατε να κάνετε</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Συμβουλές για επιστημονικό περιβάλλον -->
+            <section class="section" id="scientific-usage">
+                <h2>🎓 Χρήση σε Επιστημονικό Περιβάλλον</h2>
+                
+                <h3>📊 Conference & Symposium Setup</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🎤 Presentation Sessions</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li>15-20 λεπτά παρουσίαση</li>
+                            <li>5 λεπτά Q&A</li>
+                            <li>Προειδοποίηση στα 2 λεπτά</li>
+                            <li>Μήνυμα "Q&A Time" στο τέλος</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>☕ Coffee Breaks</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li>15 λεπτά διάλειμμα</li>
+                            <li>Countdown μέχρι την επόμενη συνεδρία</li>
+                            <li>Μήνυμα "Next Session: [Title]"</li>
+                            <li>5 λεπτά προειδοποίηση</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🏆 Award Ceremonies</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li>3-5 λεπτά ανά βραβείο</li>
+                            <li>Μήνυμα με όνομα βραβείου</li>
+                            <li>Προσαρμογή +/- για ομιλίες</li>
+                            <li>Flash alert για σπουδαιότητα</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🍽️ Lunch Sessions</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li>45-60 λεπτά διάλειμμα</li>
+                            <li>Timeline με επόμενα events</li>
+                            <li>10 λεπτά προειδοποίηση</li>
+                            <li>Μήνυμα "Please return to auditorium"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>🎯 Best Practices</h3>
+                <div class="step-list">
+                    <ol>
+                        <li><strong>Προετοιμασία:</strong> Test όλα τα setups 30 λεπτά πριν</li>
+                        <li><strong>Backup συσκευή:</strong> Κρατήστε tablet ως εφεδρικό controller</li>
+                        <li><strong>Clear visibility:</strong> Βεβαιωθείτε ότι όλοι βλέπουν το timer</li>
+                        <li><strong>Gentle warnings:</strong> Χρησιμοποιήστε το Flash με μέτρο</li>
+                        <li><strong>Flexibility:</strong> Έχετε τα +/- κουμπιά έτοιμα για προσαρμογές</li>
+                    </ol>
+                </div>
+
+                <h3>📋 Προτεινόμενες Ρυθμίσεις</h3>
+                <table class="controls-table">
+                    <thead>
+                        <tr>
+                            <th>Τύπος Εκδήλωσης</th>
+                            <th>Χρόνος</th>
+                            <th>Προειδοποίηση</th>
+                            <th>Μηνύματα</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Research Presentation</td>
+                            <td>20:00</td>
+                            <td>2 λεπτά (120s)</td>
+                            <td>"Q&A Time" στο τέλος</td>
+                        </tr>
+                        <tr>
+                            <td>Keynote Speech</td>
+                            <td>45:00</td>
+                            <td>5 λεπτά (300s)</td>
+                            <td>"Thank you" στο τέλος</td>
+                        </tr>
+                        <tr>
+                            <td>Poster Session</td>
+                            <td>90:00</td>
+                            <td>10 λεπτά (600s)</td>
+                            <td>"Closing in 10 min"</td>
+                        </tr>
+                        <tr>
+                            <td>Coffee Break</td>
+                            <td>15:00</td>
+                            <td>5 λεπτά (300s)</td>
+                            <td>"Please return"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Χρήσιμοι Σύνδεσμοι -->
+            <section class="section" id="resources">
+                <h2>🔗 Χρήσιμοι Σύνδεσμοι & Πόροι</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>📁 Αρχεία Εφαρμογής</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li><strong>timer.exe</strong> - Desktop εφαρμογή</li>
+                            <li><strong>admin.html</strong> - Admin panel</li>
+                            <li><strong>timer.html</strong> - Timer display</li>
+                            <li><strong>server.js</strong> - Backend server</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⚙️ Ρυθμίσεις URLs</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li><strong>Admin:</strong> http://localhost:3000/admin.html</li>
+                            <li><strong>Timer:</strong> http://localhost:3000/timer.html</li>
+                            <li><strong>Manual:</strong> http://localhost:3000/manual.html</li>
+                            <li><strong>API:</strong> http://localhost:3000/api/</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🎵 Ηχητικά Αρχεία</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li><strong>warning.mp3</strong> - Προειδοποίηση</li>
+                            <li><strong>end.mp3</strong> - Τέλος χρόνου</li>
+                            <li>Μπορείτε να τα αντικαταστήσετε</li>
+                            <li>Υποστηρίζει .mp3, .wav, .ogg</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔧 Τεχνικές Απαιτήσεις</h4>
+                        <ul style="margin-top: 10px; margin-left: 15px;">
+                            <li><strong>OS:</strong> Windows 10/11</li>
+                            <li><strong>RAM:</strong> 4GB ελάχιστο</li>
+                            <li><strong>Browser:</strong> Chrome/Edge/Firefox</li>
+                            <li><strong>Network:</strong> WiFi για πολλαπλές συσκευές</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="footer">
+            <h3>📺 Conference Timer v2.0</h3>
+            <p>Επαγγελματικό σύστημα χρονομέτρησης για παρουσιάσεις και εκδηλώσεις</p>
+            <p style="margin-top: 10px; opacity: 0.8;">
+                Δημιουργήθηκε με ❤️ για την επιστημονική κοινότητα | 
+                <a href="#top" style="color: var(--secondary-color);">↑ Επιστροφή στην κορυφή</a>
+            </p>
+            <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.7;">
+                <p>© 2024 Conference Timer Project. All rights reserved.</p>
+                <p>Τελευταία ενημέρωση: Δεκέμβριος 2024</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling για navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section στο navigation
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.backgroundColor = '';
+                link.style.color = '';
+                if (link.getAttribute('href') === '#' + current) {
+                    link.style.backgroundColor = 'var(--secondary-color)';
+                    link.style.color = 'white';
+                }
+            });
+        });
+
+        // Print functionality
+        function printManual() {
+            window.print();
+        }
+
+        // Copy URL functionality
+        function copyCurrentURL() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('URL αντιγράφηκε στο clipboard!');
+            });
+        }
+
+        // Search functionality (βασική)
+        function searchManual() {
+            const searchTerm = prompt('Αναζήτηση στο εγχειρίδιο:');
+            if (searchTerm) {
+                window.find(searchTerm);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 'f':
+                        e.preventDefault();
+                        searchManual();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        printManual();
+                        break;
+                }
+            }
+        });
+
+        console.log('📺 Conference Timer Manual v2.0 loaded successfully!');
+        console.log('🔍 Tip: Press Ctrl+F to search, Ctrl+P to print');
+    </script>
+</body>
+</html>

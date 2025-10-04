@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Προειδοποίηση HDMI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .dialog-container {
+            background: #2c3e50;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .warning-icon {
+            font-size: 2.5rem;
+            color: #ff8c00;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .dialog-title {
+            margin: 0 0 15px 0;
+            color: #ff8c00;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .dialog-message {
+            margin: 0 0 15px 0;
+            color: white;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .detail-text {
+            margin: 10px 0 25px 0;
+            color: #bdc3c7;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <span class="warning-icon">⚠️</span>
+        <h3 class="dialog-title" id="dialog-title">Προειδοποίηση HDMI</h3>
+        <p class="dialog-message" id="dialog-message">Δεν έχει συνδεθεί δεύτερη οθόνη!</p>
+        <div class="detail-text" id="dialog-detail">Συνδέστε μια δεύτερη οθόνη (HDMI/DisplayPort/USB-C) και δοκιμάστε ξανά.</div>
+        
+        <div class="dialog-buttons">
+            <button class="btn btn-primary" onclick="closeDialog('ok')" id="ok-btn">
+                Εντάξει
+            </button>
+            <button class="btn btn-secondary" onclick="closeDialog('cancel')" id="cancel-btn" style="display: none;">
+                Ακύρωση
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Λήψη παραμέτρων από την κύρια εφαρμογή
+        ipcRenderer.on('dialog-data', (event, data) => {
+            console.log('Received dialog data:', data);
+            
+            if (data.title) {
+                document.getElementById('dialog-title').textContent = data.title;
+            }
+            
+            if (data.message) {
+                document.getElementById('dialog-message').textContent = data.message;
+            }
+            
+            if (data.detail) {
+                document.getElementById('dialog-detail').textContent = data.detail;
+            }
+            
+            // Προσαρμογή κουμπιών βάσει τύπου
+            const okBtn = document.getElementById('ok-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            
+            if (data.type === 'confirm') {
+                cancelBtn.style.display = 'block';
+                okBtn.textContent = data.okText || 'Ναι';
+                cancelBtn.textContent = data.cancelText || 'Όχι';
+            } else {
+                cancelBtn.style.display = 'none';
+                okBtn.textContent = data.okText || 'Εντάξει';
+            }
+        });
+
+        function closeDialog(result) {
+            console.log('Dialog closed with result:', result);
+            ipcRenderer.send('dialog-result', result);
+        }
+
+        // ESC key support
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeDialog('cancel');
+            }
+        });
+
+        // Focus το πρώτο κουμπί όταν ανοίξει το dialog
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('ok-btn').focus();
+        });
+    </script>
+</body>
+</html>

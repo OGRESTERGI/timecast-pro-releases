@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Έξοδος από την εφαρμογή</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2C3E50, #34495E);
+            color: #F2F0EB;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .dialog-container {
+            background: rgba(242, 240, 235, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(242, 240, 235, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border: 2px solid #e74c3c;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 300;
+            margin: 0 0 15px 0;
+            letter-spacing: 1px;
+            color: #e74c3c;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0 0 25px 0;
+            opacity: 0.9;
+        }
+
+        .warning-text {
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .warning-text strong {
+            color: #f39c12;
+        }
+
+        .system-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .system-info .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .status-value {
+            font-weight: 500;
+            color: #3498db;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-cancel {
+            background: #27ae60;
+            color: white;
+            border: 1px solid #2ecc71;
+        }
+
+        .btn-cancel:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-exit {
+            background: #e74c3c;
+            color: white;
+            border: 1px solid #c0392b;
+        }
+
+        .btn-exit:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .version-info {
+            margin-top: 20px;
+            font-size: 11px;
+            opacity: 0.6;
+            border-top: 1px solid rgba(242, 240, 235, 0.1);
+            padding-top: 15px;
+        }
+
+        /* Keyboard shortcuts indicator */
+        .shortcuts {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 15px;
+            padding: 8px;
+            background: rgba(242, 240, 235, 0.05);
+            border-radius: 6px;
+        }
+
+        .shortcut-key {
+            display: inline-block;
+            background: rgba(242, 240, 235, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            margin: 0 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <div class="icon">⚠️</div>
+        
+        <h1 class="title">Έξοδος από το TimeCast™ Pro</h1>
+        
+        <div class="message">
+            Είστε σίγουροι ότι θέλετε να κλείσετε την εφαρμογή;
+        </div>
+
+        <div class="warning-text">
+            <strong>⚠️ Προσοχή:</strong><br>
+            • Όλες οι συνδεδεμένες συσκευές θα αποσυνδεθούν<br>
+            • Το τρέχον χρονόμετρο θα σταματήσει<br>
+            • Ο εσωτερικός server θα τερματιστεί
+        </div>
+
+        <div class="system-info">
+            <div class="status-item">
+                <span>📡 Συνδεδεμένες συσκευές:</span>
+                <span class="status-value" id="connectedClients">-</span>
+            </div>
+            <div class="status-item">
+                <span>⏱️ Κατάσταση χρονομέτρου:</span>
+                <span class="status-value" id="timerStatus">-</span>
+            </div>
+            <div class="status-item">
+                <span>🎥 vMix σύνδεση:</span>
+                <span class="status-value" id="vmixStatus">-</span>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-cancel" onclick="cancelExit()">
+                <span>Άκυρο</span>
+            </button>
+            <button class="btn btn-exit" onclick="confirmExit()">
+                <span>Έξοδος</span>
+            </button>
+        </div>
+
+        <div class="shortcuts">
+            <span class="shortcut-key">ESC</span> για άκυρο |
+            <span class="shortcut-key">Enter</span> για έξοδο
+        </div>
+
+        <div class="version-info">
+            TimeCast™ Pro v<span id="version">4.2.1</span><br>
+            🏢 © 2025 Sovereign Event Systems
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const i18next = require('i18next');
+        const Backend = require('i18next-fs-backend');
+        const path = require('path');
+        const fs = require('fs');
+
+        // Initialize i18next
+        async function initI18next() {
+            try {
+                // Load saved language preference
+                let savedLanguage = 'el';
+                try {
+                    const configPath = path.join(__dirname, 'language-config.json');
+                    if (fs.existsSync(configPath)) {
+                        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+                        savedLanguage = config.language || 'el';
+                    }
+                } catch (e) {
+                    console.log('No saved language config found, using default: el');
+                }
+
+                await i18next.use(Backend).init({
+                    lng: savedLanguage,
+                    fallbackLng: 'el',
+                    supportedLngs: ['el', 'en'],
+                    ns: ['admin'],
+                    defaultNS: 'admin',
+                    backend: {
+                        loadPath: path.join(__dirname, 'locales', '{{lng}}', '{{ns}}.json')
+                    }
+                });
+
+                console.log('✅ i18next initialized in exit-dialog - Language:', i18next.language);
+                updateDialogTexts();
+            } catch (error) {
+                console.error('❌ i18next initialization failed:', error);
+            }
+        }
+
+        // Update all dialog texts
+        function updateDialogTexts() {
+            document.title = i18next.t('exitDialog.title');
+            document.querySelector('.title').textContent = i18next.t('exitDialog.title');
+            document.querySelector('.message').textContent = i18next.t('exitDialog.message');
+            
+            document.querySelector('.warning-text').innerHTML = 
+                `<strong>${i18next.t('exitDialog.warningTitle')}</strong><br>${i18next.t('exitDialog.warningItems')}`;
+            
+            document.querySelector('.status-item:nth-child(1) span:first-child').textContent = i18next.t('exitDialog.connectedDevices');
+            document.querySelector('.status-item:nth-child(2) span:first-child').textContent = i18next.t('exitDialog.timerStatus');
+            document.querySelector('.status-item:nth-child(3) span:first-child').textContent = i18next.t('exitDialog.vmixConnection');
+            
+            document.querySelector('.btn-cancel span').textContent = i18next.t('exitDialog.buttonCancel');
+            document.querySelector('.btn-exit span').textContent = i18next.t('exitDialog.buttonExit');
+            
+            document.querySelector('.shortcuts').innerHTML = 
+                `<span class="shortcut-key">ESC</span> ${i18next.t('exitDialog.shortcutsText')} <span class="shortcut-key">Enter</span> ${i18next.t('exitDialog.shortcutsText2')}`;
+        }
+        
+        // Update system status
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initI18next();
+            
+            try {
+                // Get version
+                const version = await ipcRenderer.invoke('get-app-version');
+                document.getElementById('version').textContent = version;
+
+                // Get system status
+                const status = await ipcRenderer.invoke('get-exit-dialog-info');
+                
+                document.getElementById('connectedClients').textContent = status.connectedClients || '0';
+                document.getElementById('timerStatus').textContent = status.timerRunning ? 
+                    i18next.t('exitDialog.timerActive') : i18next.t('exitDialog.timerInactive');
+                document.getElementById('vmixStatus').textContent = status.vmixConnected ? 
+                    i18next.t('exitDialog.vmixConnected') : i18next.t('exitDialog.vmixDisconnected');
+                
+            } catch (error) {
+                console.error('Error loading exit dialog info:', error);
+            }
+        });
+
+        function cancelExit() {
+            ipcRenderer.send('exit-dialog-response', false);
+        }
+
+        function confirmExit() {
+            ipcRenderer.send('exit-dialog-response', true);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                cancelExit();
+            } else if (e.key === 'Enter') {
+                confirmExit();
+            }
+        });
+
+        // Auto-focus on first button for accessibility
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.btn-cancel').focus();
+        });
+    </script>
+</body>
+</html>

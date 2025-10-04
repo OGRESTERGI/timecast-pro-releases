@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Προστασία Δεδομένων (GDPR)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1E2B36, #2C3E50);
+            color: #F2F0EB;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border: 2px solid #3498db;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 300;
+            margin: 0;
+            letter-spacing: 1px;
+            color: #3498db;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin: 5px 0;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(242, 240, 235, 0.05);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(242, 240, 235, 0.1);
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #F2F0EB;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-left: 8px;
+        }
+
+        .section-content ul {
+            margin: 8px 0;
+            padding-left: 16px;
+        }
+
+        .section-content li {
+            margin: 4px 0;
+        }
+
+        .legal-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .contact-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+            margin: 15px 0;
+            padding-top: 15px;
+            border-top: 1px solid rgba(242, 240, 235, 0.1);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(242, 240, 235, 0.1);
+            color: #F2F0EB;
+            border: 1px solid rgba(242, 240, 235, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(242, 240, 235, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Scrollbar styling */
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: rgba(242, 240, 235, 0.1);
+            border-radius: 4px;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: rgba(242, 240, 235, 0.3);
+            border-radius: 4px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: rgba(242, 240, 235, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <div class="header">
+            <div class="logo">🔒</div>
+            <h1 class="title">Προστασία Δεδομένων (GDPR)</h1>
+            <div class="subtitle" id="subtitle">TimeCast™ Pro - Πληροφορίες GDPR</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <div class="section-title">📊 ΣΥΛΛΟΓΗ ΔΕΔΟΜΕΝΩΝ:</div>
+                <div class="section-content">
+                    <ul>
+                        <li>IP διευθύνσεις συσκευών (προσωρινά, μόνο κατά τη σύνδεση)</li>
+                        <li>Τίτλοι παρουσιάσεων και event markers (τοπικά)</li>
+                        <li>Μηνύματα ερωτήσεων (τοπικά, εφόσον χρησιμοποιείται)</li>
+                        <li>Ρυθμίσεις εφαρμογής (τοπικά στη συσκευή)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🎯 ΣΚΟΠΟΣ ΕΠΕΞΕΡΓΑΣΙΑΣ:</div>
+                <div class="section-content">
+                    <ul>
+                        <li>Απρόσκοπτη λειτουργία συστήματος χρονομέτρησης</li>
+                        <li>Εμφάνιση πληροφοριών συνεδρίου σε συνδεδεμένες οθόνες</li>
+                        <li>Διαχείριση ερωτήσεων κατά τη διάρκεια παρουσιάσεων</li>
+                        <li>Συγχρονισμός Google Sheets και vMix integration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🏛️ ΝΟΜΙΚΌ ΠΛΑΙΣΙΟ:</div>
+                <div class="section-content">
+                    Άρθρο 6 παρ. 1 στοιχ. (f) GDPR - Νόμιμο συμφέρον για τεχνική λειτουργία
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">⏱️ ΔΙΑΤΗΡΗΣΗ:</div>
+                <div class="section-content">
+                    <ul>
+                        <li>IP διευθύνσεις: Προσωρινά (μόνο κατά τη σύνδεση)</li>
+                        <li>Event markers: Τοπικά στη συσκευή διοργανωτή</li>
+                        <li>Ερωτήσεις JSON: Documents/TimeCast ή επιλεγμένος φάκελος</li>
+                        <li>Καμία αποθήκευση σε cloud ή εξωτερικούς servers</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">✊ ΔΙΚΑΙΩΜΑΤΑ ΧΡΗΣΤΩΝ:</div>
+                <div class="section-content">
+                    <ul>
+                        <li>Πρόσβαση στα δεδομένα που επεξεργαζόμαστε</li>
+                        <li>Διόρθωση λανθασμένων στοιχείων</li>
+                        <li>Διαγραφή από το τοπικό σύστημα</li>
+                        <li>Αντίρρηση στην επεξεργασία</li>
+                        <li>Φορητότητα δεδομένων (JSON export)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🛡️ ΑΣΦΑΛΕΙΑ:</div>
+                <div class="section-content">
+                    Τοπική λειτουργία (localhost) χωρίς αποστολή δεδομένων σε τρίτους.<br>
+                    Κρυπτογραφημένες συνδέσεις WebSocket όπου διαθέσιμο.<br>
+                    Εφαρμογή Privacy by Design αρχών.
+                </div>
+            </div>
+
+            <div class="contact-info">
+                <strong>📧 ΕΠΙΚΟΙΝΩΝΙΑ:</strong><br>
+                Υπεύθυνος Προστασίας Δεδομένων: dpo@sovereign.gr<br>
+                Τεχνική Υποστήριξη: support@sovereign.gr
+            </div>
+
+            <div class="legal-notice">
+                <strong>™️ ΝΟΜΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ:</strong><br>
+                TimeCast™ είναι εμπορικό σήμα (trademark) της Sovereign Event Systems.<br>
+                Το σύμβολο ™ υποδηλώνει unregistered trademark rights.
+            </div>
+
+            <div class="footer">
+                TimeCast™ Pro v<span id="version">4.2.1</span> - Privacy by Design<br>
+                🏢 © 2025 Sovereign Event Systems. Όλα τα δικαιώματα διατηρούνται.<br>
+                Σύμφωνο με GDPR από το σχεδιασμό<br>
+                Τελευταία ενημέρωση: <span id="updateDate"></span>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-secondary" onclick="closeDialog()">Κλείσιμο</button>
+            <button class="btn btn-primary" onclick="contactDPO()">Επικοινωνία DPO</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        const i18next = require('i18next');
+        const Backend = require('i18next-fs-backend');
+        const path = require('path');
+        const fs = require('fs');
+
+        // Initialize i18next
+        async function initI18next() {
+            try {
+                // Load saved language preference
+                let savedLanguage = 'el';
+                try {
+                    const configPath = path.join(__dirname, 'language-config.json');
+                    if (fs.existsSync(configPath)) {
+                        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+                        savedLanguage = config.language || 'el';
+                    }
+                } catch (e) {
+                    console.log('No saved language config found, using default: el');
+                }
+
+                await i18next.use(Backend).init({
+                    lng: savedLanguage,
+                    fallbackLng: 'el',
+                    supportedLngs: ['el', 'en'],
+                    ns: ['admin'],
+                    defaultNS: 'admin',
+                    backend: {
+                        loadPath: path.join(__dirname, 'locales', '{{lng}}', '{{ns}}.json')
+                    }
+                });
+
+                console.log('✅ i18next initialized in gdpr-dialog - Language:', i18next.language);
+                updateDialogTexts();
+            } catch (error) {
+                console.error('❌ i18next initialization failed:', error);
+            }
+        }
+
+        // Update key dialog texts
+        function updateDialogTexts() {
+            document.title = i18next.t('gdprDialog.title');
+            document.querySelector('.title').textContent = i18next.t('gdprDialog.title');
+            
+            // Update section titles
+            const sections = document.querySelectorAll('.section-title');
+            if (sections[0]) sections[0].textContent = i18next.t('gdprDialog.dataCollectionTitle');
+            if (sections[1]) sections[1].textContent = i18next.t('gdprDialog.processingPurposeTitle');
+            if (sections[2]) sections[2].textContent = i18next.t('gdprDialog.legalBasisTitle');
+            if (sections[3]) sections[3].textContent = i18next.t('gdprDialog.retentionTitle');
+            if (sections[4]) sections[4].textContent = i18next.t('gdprDialog.rightsTitle');
+            if (sections[5]) sections[5].textContent = i18next.t('gdprDialog.securityTitle');
+            
+            // Update section contents
+            const sectionContents = document.querySelectorAll('.section-content');
+            
+            // Data Collection items
+            if (sectionContents[0]) {
+                const dataItems = i18next.t('gdprDialog.dataCollectionItems', { returnObjects: true });
+                sectionContents[0].innerHTML = '<ul>' + dataItems.map(item => `<li>${item}</li>`).join('') + '</ul>';
+            }
+            
+            // Processing Purpose items
+            if (sectionContents[1]) {
+                const purposeItems = i18next.t('gdprDialog.processingPurposeItems', { returnObjects: true });
+                sectionContents[1].innerHTML = '<ul>' + purposeItems.map(item => `<li>${item}</li>`).join('') + '</ul>';
+            }
+            
+            // Legal Basis text
+            if (sectionContents[2]) {
+                sectionContents[2].textContent = i18next.t('gdprDialog.legalBasisText');
+            }
+            
+            // Retention items
+            if (sectionContents[3]) {
+                const retentionItems = i18next.t('gdprDialog.retentionItems', { returnObjects: true });
+                sectionContents[3].innerHTML = '<ul>' + retentionItems.map(item => `<li>${item}</li>`).join('') + '</ul>';
+            }
+            
+            // Rights items
+            if (sectionContents[4]) {
+                const rightsItems = i18next.t('gdprDialog.rightsItems', { returnObjects: true });
+                sectionContents[4].innerHTML = '<ul>' + rightsItems.map(item => `<li>${item}</li>`).join('') + '</ul>';
+            }
+            
+            // Security text
+            if (sectionContents[5]) {
+                sectionContents[5].innerHTML = i18next.t('gdprDialog.securityText');
+            }
+            
+            // Update contact info
+            const contactInfo = document.querySelector('.contact-info');
+            if (contactInfo) {
+                contactInfo.innerHTML = `<strong>${i18next.t('gdprDialog.contactInfoTitle')}</strong><br>${i18next.t('gdprDialog.contactInfoText')}`;
+            }
+            
+            // Update legal notice
+            const legalNotice = document.querySelector('.legal-notice');
+            if (legalNotice) {
+                legalNotice.innerHTML = `<strong>${i18next.t('gdprDialog.legalNoticeTitle')}</strong><br>${i18next.t('gdprDialog.legalNoticeText')}`;
+            }
+            
+            // Update footer copyright part
+            const footer = document.querySelector('.footer');
+            if (footer) {
+                const version = document.getElementById('version').textContent;
+                const currentLang = i18next.language || 'el';
+                const gdprCompliant = currentLang === 'en' ? 'GDPR compliant by design' : 'Σύμφωνο με GDPR από το σχεδιασμό';
+                const copyrightText = currentLang === 'en' ? 
+                    '🏢 © 2025 Sovereign Event Systems. All rights reserved.' : 
+                    '🏢 © 2025 Sovereign Event Systems. Όλα τα δικαιώματα διατηρούνται.';
+                
+                footer.innerHTML = `TimeCast™ Pro v<span id="version">${version}</span> - Privacy by Design<br>${copyrightText}<br>${gdprCompliant}<br>Τελευταία ενημέρωση: <span id="updateDate">${document.getElementById('updateDate').textContent}</span>`;
+            }
+            
+            // Update buttons
+            document.querySelector('.btn-primary').textContent = i18next.t('gdprDialog.buttonContact');
+            document.querySelector('.btn-secondary').textContent = i18next.t('gdprDialog.buttonClose');
+        }
+
+        // Update version and date
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initI18next();
+            
+            try {
+                const version = await ipcRenderer.invoke('get-app-version');
+                document.getElementById('version').textContent = version;
+                
+                const currentLang = i18next.language || 'el';
+                const subtitle = currentLang === 'en' ? 
+                    `TimeCast™ Pro v${version} - GDPR Information` : 
+                    `TimeCast™ Pro v${version} - Πληροφορίες GDPR`;
+                document.getElementById('subtitle').textContent = subtitle;
+                
+                const locale = currentLang === 'en' ? 'en-US' : 'el-GR';
+                document.getElementById('updateDate').textContent = new Date().toLocaleDateString(locale);
+            } catch (error) {
+                console.error('Error loading version info:', error);
+            }
+        });
+
+        function closeDialog() {
+            ipcRenderer.send('close-gdpr-dialog');
+        }
+
+        function contactDPO() {
+            ipcRenderer.send('open-website', 'mailto:dpo@sovereign.gr?subject=GDPR Inquiry - TimeCast™ Pro&body=Γεια σας,%0D%0A%0D%0AΘα θέλα πληροφορίες σχετικά με την προστασία δεδομένων στο TimeCast™ Pro...%0D%0A%0D%0AΕυχαριστώ');
+            closeDialog();
+        }
+
+        // ESC key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>TimeCast® Pro - Loading</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1E2B36, #2C3E50);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .logo-container {
+      margin-bottom: 30px;
+    }
+
+    .rotating {
+      width: 200px;
+      height: 200px;
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 0 20px rgba(242, 240, 235, 0.3));
+    }
+
+    .brand-text {
+      text-align: center;
+      color: #F2F0EB;
+      margin-top: 0px;
+    }
+
+    .brand-title {
+      font-size: 32px;
+      font-weight: 300;
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    .brand-subtitle {
+      font-size: 14px;
+      margin: 5px 0 0 0;
+      opacity: 0.8;
+      font-weight: 300;
+    }
+
+    .loading-text {
+      color: #F2F0EB;
+      font-size: 16px;
+      margin-top: 30px;
+      opacity: 0.7;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .sovereign-branding {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+      margin-bottom: 40px;
+    }
+
+    .sovereign-branding:hover {
+      opacity: 1;
+    }
+
+    .sovereign-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sovereign-text {
+      text-align: center;
+    }
+
+    .sovereign-name {
+      color: #ffffff;
+      font-family: 'Impact', 'Arial Black', 'Helvetica Neue', sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .sovereign-tagline {
+      color: #F2F0EB;
+      font-size: 12px;
+      opacity: 0.6;
+      font-weight: 300;
+      line-height: 1.2;
+      margin-top: 2px;
+      
+    }
+
+    .version {
+      color: #F2F0EB;
+      font-size: 12px;
+      opacity: 0.5;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sovereign-branding">
+    <div class="sovereign-text">
+      <div class="sovereign-name">Sovereign Event Systems</div>
+      <div class="sovereign-tagline">Professional Event Technology</div>
+    </div>
+  </div>
+
+  <div class="logo-container">
+    <div class="rotating">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+
+        <defs>
+          <!-- ClipPath που περιορίζει τα κύματα μέσα στην κλεψύδρα -->
+          <clipPath id="hourglassClip">
+            <path d="M25,20 L75,20 L50,50 L75,80 L25,80 L50,50 Z" />
+          </clipPath>
+        </defs>
+
+        <!-- Φόντο κύκλος -->
+        <circle cx="50" cy="50" r="48" fill="#1E2B36" />
+        
+        <!-- Περίγραμμα κύκλου -->
+        <circle cx="50" cy="50" r="48" fill="none" stroke="#F2F0EB" stroke-width="3" />
+
+        <!-- Περίγραμμα κλεψύδρας -->
+        <path d="M25,20 L75,20 L50,50 L75,80 L25,80 L50,50 Z"
+              fill="none" stroke="#F2F0EB" stroke-width="1.6" />
+
+        <!-- Ομάδα κυμάτων περιορισμένα στην κλεψύδρα -->
+        <g clip-path="url(#hourglassClip)">
+          <!-- Κύμα 1 -->
+          <circle cx="50" cy="50" r="2" fill="none" stroke="#F2F0EB" stroke-width="1">
+            <animate attributeName="r" values="2;22" dur="3s" begin="0s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="1;0" dur="7s" begin="0s" repeatCount="indefinite" />
+          </circle>
+          <!-- Κύμα 2 -->
+          <circle cx="50" cy="50" r="2" fill="none" stroke="#F2F0EB" stroke-width="1">
+            <animate attributeName="r" values="2;22" dur="3s" begin="0.6s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="1;0" dur="7s" begin="1s" repeatCount="indefinite" />
+          </circle>
+          <!-- Κύμα 3 -->
+          <circle cx="50" cy="50" r="2" fill="none" stroke="#F2F0EB" stroke-width="1">
+            <animate attributeName="r" values="2;22" dur="3s" begin="1.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="1;0" dur="7s" begin="2s" repeatCount="indefinite" />
+          </circle>
+          <!-- Κύμα 4 -->
+          <circle cx="50" cy="50" r="2" fill="none" stroke="#F2F0EB" stroke-width="1">
+            <animate attributeName="r" values="2;22" dur="3s" begin="1.8s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="1;0" dur="7s" begin="4s" repeatCount="indefinite" />
+          </circle>
+        </g>
+
+      </svg>
+    </div>
+  </div>
+
+  <div class="brand-text">
+    <h1 class="brand-title">TimeCast™ Pro</h1>
+    <p class="brand-subtitle">An Overachieving Timer System</p>
+    <div class="version">
+    v6.7.0
+  </div>
+  </div>
+
+
+  <div class="loading-text">
+    Φόρτωση συστήματος...
+  </div>
+
+  
+
+</body>
+</html>

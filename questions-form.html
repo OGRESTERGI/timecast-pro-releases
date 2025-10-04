@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <script src="libs/NoSleep.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Ερωτήσεις προς Ομιλητές</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #a2b2c2;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgb(187, 214, 245);
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-logo-container {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: calc(min(12vw, 60px)); /* Smaller max size to prevent spill */
+            height: calc(min(12vw, 60px)); /* Same height as width */
+            max-width: 60px;
+            max-height: 60px;
+            min-width: 35px;
+            min-height: 35px;
+        }
+
+        .header-content {
+            flex: 1;
+            text-align: center;
+            margin-left: calc(min(12vw, 60px) + 20px); /* Logo width + position from left */
+            margin-right: 20px; /* Right position from edge */
+            padding: 0; /* Remove any default padding */
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin: 0; /* Remove all margins */
+            padding: 0; /* Remove all padding */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2c3e50;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            border: none;
+            padding: 14px 18px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(44, 62, 80, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header-logo-container {
+                left: 15px; /* Closer to edge on mobile */
+            }
+            
+            .header-content {
+                margin-left: calc(min(12vw, 60px) + 15px); /* Logo width + position on mobile */
+                margin-right: 15px; /* Edge position on mobile */
+            }
+            
+            /* Language selector mobile adjustments */
+            .language-selector {
+                right: 15px !important; /* Closer to edge on mobile */
+                gap: 6px !important; /* Smaller gap on mobile */
+            }
+            
+            .lang-flag {
+                font-size: 20px !important; /* Smaller flags on mobile */
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+        }
+
+        /* Autocomplete Styles για ΓΕΜΗ API */
+        .autocomplete-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 12px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.2s ease;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.highlighted {
+            background-color: #f8f9fa;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .company-source {
+            font-weight: 400;
+            color: #7f8c8d;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .company-details {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .loading-indicator {
+            padding: 12px 14px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .no-results {
+            padding: 12px 14px;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Right-click context menu -->
+    <div id="contextMenu" style="position: fixed; background: #2c3e50; border: 1px solid #34495e; border-radius: 4px; padding: 8px 0; display: none; z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+        <div id="setPcName" style="padding: 8px 16px; cursor: pointer; color: white; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#34495e'" onmouseout="this.style.background='transparent'">
+            💻 Set PC Name
+        </div>
+    </div>
+    
+    <!-- Custom input dialog -->
+    <div id="pcNameDialog" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: #2c3e50; padding: 20px; border-radius: 8px; color: white; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <h3 style="margin-top: 0; color: #ecf0f1;">💻 Όνομα Υπολογιστή</h3>
+            <input type="text" id="pcNameInput" style="width: 200px; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; font-size: 16px; text-align: center;" placeholder="π.x. ASUS">
+            <div style="margin-top: 15px;">
+                <button id="pcNameOk" style="background: #27ae60; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 14px;">OK</button>
+                <button id="pcNameCancel" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 14px;">Ακύρωση</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="header-logo-container">
+                <div id="header-logo" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; display: none;"></div>
+            </div>
+            <div class="header-content">
+                <h1 id="conference-title">TimeCast™ Pro</h1>
+            </div>
+        </div>
+
+        <!-- Language Selector - Two Rows -->
+        <div class="language-selector" style="
+            text-align: center;
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 0 auto;
+            max-width: 900px;
+            border-radius: 15px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        ">
+            <!-- First Row - 12 languages -->
+            <div style="
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                margin-bottom: 10px;
+                flex-wrap: wrap;
+                padding: 0 20px;
+            ">
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('el')" title="Ελληνικά">🇬🇷</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('en')" title="English">🇺🇸</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('fr')" title="Français">🇫🇷</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('de')" title="Deutsch">🇩🇪</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('es')" title="Español">🇪🇸</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('it')" title="Italiano">🇮🇹</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('da')" title="Dansk">🇩🇰</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('uk')" title="Українська">🇺🇦</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('nl')" title="Nederlands">🇳🇱</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('pt')" title="Português">🇵🇹</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('ro')" title="Română">🇷🇴</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('hr')" title="Hrvatski">🇭🇷</div>
+            </div>
+            
+            <!-- Second Row - 12 languages -->
+            <div style="
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                flex-wrap: wrap;
+                padding: 0 20px;
+            ">
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('pl')" title="Polski">🇵🇱</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('lv')" title="Latviešu">🇱🇻</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('sl')" title="Slovenščina">🇸🇮</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('et')" title="Eesti">🇪🇪</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('fi')" title="Suomi">🇫🇮</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('sv')" title="Svenska">🇸🇪</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('cs')" title="Čeština">🇨🇿</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('hu')" title="Magyar">🇭🇺</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('lt')" title="Lietuvių">🇱🇹</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('sk')" title="Slovenčina">🇸🇰</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('bg')" title="Български">🇧🇬</div>
+                <div class="lang-flag" style="cursor: pointer; font-size: 24px; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; user-select: none;" onclick="switchLanguage('mt')" title="Malti">🇲🇹</div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <p style="text-align: center; margin-bottom: 20px; color: #555; font-size: 16px; font-weight: 500;" data-i18n="subtitle">
+                Υποβάλετε την ερώτησή σας
+            </p>
+            
+            <div class="success-message" id="successMessage" data-i18n="successMessage">
+                ✅ Η ερώτησή σας υποβλήθηκε επιτυχώς! Θα εξεταστεί από τη διοργάνωση.
+            </div>
+
+            <form id="questionForm">
+                <div class="form-group">
+                    <label for="name" data-i18n="labels.name">Όνομα <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="company" data-i18n="labels.company">Εταιρεία <span class="required">*</span></label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="company" name="company" required placeholder="Πληκτρολογήστε το όνομα της εταιρείας..." data-i18n-placeholder="placeholders.company">
+                        <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="department" data-i18n="labels.department">Τμήμα</label>
+                    <input type="text" id="department" name="department" placeholder="π.χ. Λογιστήριο, Πωλήσεις" data-i18n-placeholder="placeholders.department">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" data-i18n="labels.email">E-Mail</label>
+                    <input type="email" id="email" name="email" placeholder="Αν το ερώτημα σας δεν απαντηθεί προφορικά" data-i18n-placeholder="placeholders.email">
+                </div>
+
+                <div class="form-group">
+                    <label for="targetSpeaker" data-i18n="labels.targetSpeaker">Ερώτηση προς <span class="required">*</span></label>
+                    <select id="targetSpeaker" name="targetSpeaker" required>
+                        <option value="" data-i18n="options.loadingSpeakers">⏳ Φόρτωση ομιλητών...</option>
+                        <option value="Γιάννης Παπαδόπουλος">Γιάννης Παπαδόπουλος</option>
+                        <option value="Δημήτρης Παπαδόπουλος">Δημήτρης Παπαδόπουλος</option>
+                        <option value="Μαρία Κωνσταντίνου">Μαρία Κωνσταντίνου</option>
+                        <option value="Νίκος Αντωνίου">Νίκος Αντωνίου</option>
+                        <option value="Άννα Γεωργίου">Άννα Γεωργίου</option>
+                        <option value="Γενική Ερώτηση (Όλοι)" data-i18n="options.generalQuestion">Γενική Ερώτηση (Όλοι)</option>
+                    </select>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label for="subject" data-i18n="labels.subject">Θέμα <span class="required">*</span></label>
+                    <input type="text" id="subject" name="subject" placeholder="π.χ. Δαπάνες Αναλωσίμων" data-i18n-placeholder="placeholders.subject" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="question" data-i18n="labels.question">Κείμενο Ερώτησης <span class="required">*</span></label>
+                    <textarea id="question" name="question" placeholder="π.χ. Πώς κάνουμε αντιλογισμούς για τα αναλώσιμα που χρησιμοποιούμε στην παραγωγή;" data-i18n-placeholder="placeholders.questionText" required maxlength="1500"></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/1500 <span data-i18n="charCounter">χαρακτήρες</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" data-i18n="submitButton">
+                    📤 Υποβολή Ερώτησης
+                </button>
+            </form>
+        </div>
+    </div>
+<script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        // Φόρτωση ομιλητών από το API
+        async function loadSpeakers() {
+    const select = document.getElementById('targetSpeaker');
+    
+    // Fallback αν δεν υπάρχει το element
+    if (!select) {
+        console.error('❌ Speaker select element not found');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/questions/speakers');
+        const data = await response.json();
+        
+        const selectSpeakerText = window.i18next ? window.i18next.t('options.selectSpeaker') : 'Επιλέξτε ομιλητή...';
+        select.innerHTML = `<option value="">${selectSpeakerText}</option>`;
+        
+        if (data.success && data.speakers) {
+            data.speakers.forEach(speaker => {
+                const option = document.createElement('option');
+                option.value = speaker;
+                option.textContent = speaker;
+                select.appendChild(option);
+            });
+            console.log(`✅ Loaded ${data.speakers.length} speakers from timeline`);
+        } else {
+            throw new Error('API returned no speakers');
+        }
+    } catch (error) {
+        console.error('❌ Error loading speakers:', error);
+        
+        // FALLBACK με custom dialog
+        const selectSpeakerText = window.i18next ? window.i18next.t('options.selectSpeaker') : 'Επιλέξτε ομιλητή...';
+        select.innerHTML = `<option value="">${selectSpeakerText}</option>`;
+        
+        const fallbackSpeakers = [
+            'Γενική Ερώτηση (Όλοι)',
+            'Γιάννης Παπαδόπουλος',
+            'Μαρία Κωνσταντίνου',
+            'Νίκος Αλεξίου'
+        ];
+        
+        fallbackSpeakers.forEach(speaker => {
+            const option = document.createElement('option');
+            option.value = speaker;
+            option.textContent = speaker;
+            select.appendChild(option);
+        });
+        
+        console.warn('⚠️ Used fallback speakers due to API error');
+        
+        // Show custom error dialog instead of alert
+        showCustomDialog('⚠️ Σύνδεση με Server', 'Η σύνδεση με τον server διακόπηκε προσωρινά. Χρησιμοποιούνται προεπιλεγμένοι ομιλητές.', 'warning');
+    }
+}
+
+        // Character counter για textarea
+        const questionTextarea = document.getElementById('question');
+        const charCount = document.getElementById('charCount');
+
+        questionTextarea.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            charCount.textContent = currentLength;
+            
+            if (currentLength > 450) {
+                charCount.style.color = '#e74c3c';
+            } else {
+                charCount.style.color = '#666';
+            }
+        });
+
+        // Form submission με API
+        document.getElementById('questionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // ΕΛΕΓΧΟΣ ΑΝ ΥΠΑΡΧΟΥΝ ΤΑ ELEMENTS
+    const nameEl = document.getElementById('name');
+    const companyEl = document.getElementById('company');
+    const targetSpeakerEl = document.getElementById('targetSpeaker');
+    
+    if (!nameEl || !companyEl || !targetSpeakerEl) {
+        console.error('❌ Form elements not found');
+        alert('❌ Σφάλμα φόρμας - παρακαλώ ανανεώστε τη σελίδα');
+        return;
+    }
+            
+            // Συλλογή δεδομένων φόρμας
+const formData = {
+    name: nameEl.value,           // ← Χρησιμοποιεί τα ελεγμένα elements
+    company: companyEl.value,     // ← από πάνω
+    department: document.getElementById('department')?.value || '',
+    email: document.getElementById('email')?.value || '',
+    targetSpeaker: targetSpeakerEl.value,
+    subject: document.getElementById('subject')?.value || '',
+    question: document.getElementById('question')?.value || ''
+};
+
+            // Validation
+            if (!formData.name || !formData.company || !formData.targetSpeaker || 
+                !formData.subject || !formData.question) {
+                alert('⚠️ Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία');
+                return;
+            }
+
+            try {
+                // Αποστολή στο API
+                const response = await fetch('/api/questions/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Επιτυχία
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Reset form
+                    this.reset();
+                    charCount.textContent = '0';
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    console.log('✅ Question submitted successfully:', result.questionId);
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(result.error || 'Αποτυχία υποβολής');
+                }
+                
+            } catch (error) {
+                console.error('❌ Submission error:', error);
+                alert(`❌ Σφάλμα υποβολής: ${error.message}`);
+            }
+        });
+
+
+        // ✅ ΣΩΣΤΟ - περιμένει πλήρη φόρτωση
+document.addEventListener('DOMContentLoaded', function() {
+    // Περιμένει λίγο ακόμα για σιγουριά
+    setTimeout(() => {
+        console.log('🔍 DOM ready, searching for elements...');
+        
+        
+        const select = document.getElementById('targetSpeaker');
+        if (select) {
+            console.log('✅ Speaker select found!');
+            loadSpeakers();
+        } else {
+            console.error('❌ Speaker select still not found after DOM ready');
+            // Δοκιμή ξανά σε 1 δευτερόλεπτο
+            setTimeout(() => {
+                loadSpeakers();
+            }, 1000);
+        }
+    }, 100);
+});
+// WebSocket connection για αυτόματη ενημέρωση ομιλητών με Rate Limiting
+let socket;
+let lastUpdateTime = 0;
+let updateTimeout = null;
+const MIN_UPDATE_INTERVAL = 30000; // 30 δευτερόλεπτα μεταξύ updates
+const MAX_RANDOM_DELAY = 10000; // 0-10 δευτερόλεπτα random delay
+
+// Update header logo function
+function updateHeaderLogo(logoDataUrl) {
+    const headerLogo = document.getElementById('header-logo');
+    if (!headerLogo) {
+        console.warn('Header logo element not found');
+        return;
+    }
+    
+    if (!logoDataUrl || logoDataUrl.trim() === '') {
+        // Clear logo
+        headerLogo.style.backgroundImage = '';
+        headerLogo.style.display = 'none';
+        console.log('🖼️ Header logo cleared');
+    } else {
+        // Set logo
+        headerLogo.style.backgroundImage = `url('${logoDataUrl}')`;
+        headerLogo.style.display = 'inline-block';
+        console.log('🖼️ Header logo updated');
+    }
+}
+
+// Update conference title function
+function updateConferenceTitle(title) {
+    const titleElement = document.getElementById('conference-title');
+    
+    if (!titleElement) {
+        console.warn('Conference title element not found');
+        return;
+    }
+    
+    if (!title || title.trim() === '' || title === 'TimeCast® Pro Presentation Timer') {
+        // Use fallback title
+        titleElement.textContent = 'TimeCast™ Pro';
+        console.log('📝 Conference title reset to default');
+    } else {
+        // Set conference title
+        titleElement.textContent = title;
+        console.log('📝 Conference title updated:', title);
+    }
+}
+
+// Load initial settings from server
+async function loadInitialSettings() {
+    try {
+        const response = await fetch('/api/timer/current');
+        const data = await response.json();
+        
+        if (data) {
+            // Update logo
+            if (data.logoDataUrl) {
+                updateHeaderLogo(data.logoDataUrl);
+                console.log('🖼️ Initial logo loaded from server');
+            } else {
+                console.log('🖼️ No initial logo available');
+            }
+            
+            // Update title
+            if (data.title) {
+                updateConferenceTitle(data.title);
+                console.log('📝 Initial title loaded from server');
+            } else {
+                console.log('📝 No initial title available');
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Could not load initial settings:', error.message);
+    }
+}
+
+// Σύνδεση στο WebSocket
+function connectWebSocket() {
+    socket = io();
+    
+    socket.on('connect', () => {
+        console.log('🔌 Connected to WebSocket for speaker updates');
+        
+        // ΚΑΤΑΧΩΡΗΣΗ ΩΣ QUESTIONS CLIENT
+        // Παίρνουμε το saved PC name
+        const savedPcName = localStorage.getItem('pcName');
+        const hostname = savedPcName && savedPcName.trim() ? savedPcName.trim() : 'Questions-Form';
+        
+        console.log('🔍 Sending hostname to server:', hostname);
+        socket.emit('registerClient', {
+            type: 'questions-client',
+            role: 'questions',
+            hostname: hostname
+        });
+        
+        console.log('📝 Registered as: questions-client');
+    });
+
+    // PING/PONG HANDLERS για heartbeat
+    socket.on('ping', () => {
+        socket.emit('pong');
+    });
+
+    socket.on('pong', () => {
+        // Server received our ping
+    });
+    
+    // Rate-limited ενημέρωση όταν αλλάζουν τα markers
+    socket.on('eventMarkersUpdate', (data) => {
+        const now = Date.now();
+        
+        console.log(`📊 Event markers update received - action: ${data.action}`);
+        
+        // Άμεση ενημέρωση για edit actions (χωρίς rate limiting)
+        if (data.action === 'edit') {
+            console.log('📝 Marker edited - immediate speaker reload');
+            
+            // Cancel τυχόν pending update
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }
+            
+            loadSpeakers(); // Άμεση ανανέωση για edits
+            lastUpdateTime = Date.now();
+            return;
+        }
+        
+        // Rate limiting για add/delete: μόνο αν έχουν περάσει 30+ δευτερόλεπτα
+        if (now - lastUpdateTime < MIN_UPDATE_INTERVAL) {
+            console.log('📊 Event markers update ignored (rate limited)');
+            return;
+        }
+        
+        // Cancel τυχόν pending update
+        if (updateTimeout) {
+            clearTimeout(updateTimeout);
+        }
+        
+        // Staggered update: random delay 0-10 δευτερόλεπτα για add/delete
+        const randomDelay = Math.random() * MAX_RANDOM_DELAY;
+        
+        console.log(`📊 Event markers updated - scheduling speaker reload in ${Math.round(randomDelay/1000)}s`);
+        
+        updateTimeout = setTimeout(() => {
+            lastUpdateTime = Date.now();
+            loadSpeakers(); // Ανανέωση λίστας ομιλητών
+            updateTimeout = null;
+        }, randomDelay);
+    });
+
+    // Listen for settings updates (official "Apply" button clicks only)
+    socket.on('settingsUpdate', (data) => {
+        console.log('⚙️ Settings update received:', data);
+        
+        // Update logo only on official settings apply (like timer.html)
+        if (data.display && data.display.logoDataUrl !== undefined) {
+            updateHeaderLogo(data.display.logoDataUrl);
+        }
+        
+        // Update title only on official settings apply
+        if (data.display && data.display.title !== undefined) {
+            updateConferenceTitle(data.display.title);
+        }
+    });
+
+    // Listen for full state updates
+    socket.on('fullStateUpdate', (data) => {
+        console.log('🔄 Full state update received');
+        
+        // Update logo from full state
+        if (data.displaySettings && data.displaySettings.logoDataUrl !== undefined) {
+            updateHeaderLogo(data.displaySettings.logoDataUrl);
+        }
+        
+        // DON'T update title from full state - only from settingsUpdate (Apply button)
+        // This ensures consistent behavior with timer.html
+        console.log('📝 Title update skipped - waiting for Apply button (settingsUpdate event)');
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('🔌 Disconnected from WebSocket');
+        // Clear pending updates on disconnect
+        if (updateTimeout) {
+            clearTimeout(updateTimeout);
+            updateTimeout = null;
+        }
+    });
+}
+
+// NoSleep για να μην σβήνει η οθόνη
+const noSleep = new NoSleep();
+let noSleepEnabled = false;
+
+// Ενεργοποίηση NoSleep με οποιοδήποτε user interaction
+function enableNoSleep() {
+    if (!noSleepEnabled) {
+        try {
+            noSleep.enable();
+            noSleepEnabled = true;
+            console.log('NoSleep ενεργοποιήθηκε');
+            
+            // Αφαίρεση όλων των listeners
+            document.removeEventListener('click', enableNoSleep, false);
+            document.removeEventListener('touchstart', enableNoSleep, false);
+            document.removeEventListener('keydown', enableNoSleep, false);
+            
+            // Εμφάνιση μηνύματος στην οθόνη
+            showNoSleepStatus();
+        } catch (error) {
+            console.error('NoSleep failed:', error);
+        }
+    }
+}
+
+// Προσθήκη listeners για διαφορετικά events
+document.addEventListener('click', enableNoSleep, false);
+document.addEventListener('touchstart', enableNoSleep, false);
+document.addEventListener('keydown', enableNoSleep, false);
+
+// Ειδική ενεργοποίηση για iOS
+if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    console.log('iOS device detected - NoSleep will activate on first touch');
+    
+    // Πρόσθετη προστασία για iOS
+    document.addEventListener('touchend', enableNoSleep, false);
+    document.addEventListener('gesturestart', enableNoSleep, false);
+}
+
+// Εμφάνιση κατάστασης NoSleep
+function showNoSleepStatus() {
+    const statusDiv = document.createElement('div');
+    statusDiv.style.cssText = `
+        position: fixed;
+        top: 5px;
+        right: 5px;
+        background: rgba(39, 174, 96, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-size: 12px;
+        z-index: 9999;
+        pointer-events: none;
+    `;
+    statusDiv.textContent = '🔋 Screen Lock Disabled';
+    document.body.appendChild(statusDiv);
+    
+    // Αφαίρεση μετά από 3 δευτερόλεπτα
+    setTimeout(() => {
+        if (statusDiv.parentNode) {
+            statusDiv.parentNode.removeChild(statusDiv);
+        }
+    }, 3000);
+}
+
+// Επανενεργοποίηση NoSleep κάθε 1 λεπτό
+setInterval(() => {
+    if (noSleepEnabled && noSleep) {
+        try {
+            noSleep.enable();
+            console.log('NoSleep reactivated - 1 minute check');
+        } catch (error) {
+            console.error('NoSleep reactivation failed:', error);
+        }
+    }
+}, 60000); // Κάθε 1 λεπτό
+
+// Εκκίνηση WebSocket μετά το DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Υπάρχων κώδικας...
+    setTimeout(() => {
+        console.log('🔍 DOM ready, searching for elements...');
+        
+        const select = document.getElementById('targetSpeaker');
+        if (select) {
+            console.log('✅ Speaker select found!');
+            loadSpeakers();
+            
+            // ΝΕΟΣ: Σύνδεση WebSocket για auto-updates
+            connectWebSocket();
+            
+            // Load initial settings (logo + title)
+            loadInitialSettings();
+        } else {
+            console.error('❌ Speaker select still not found after DOM ready');
+            setTimeout(() => {
+                loadSpeakers();
+                connectWebSocket(); // Και εδώ
+                loadInitialSettings(); // Και εδώ
+            }, 1000);
+        }
+    }, 100);
+});
+
+// Right-click context menu functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // Right-click context menu events
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+    });
+    
+    // Hide context menu on click elsewhere
+    document.addEventListener('click', function(e) {
+        const contextMenu = document.getElementById('contextMenu');
+        if (!contextMenu.contains(e.target)) {
+            contextMenu.style.display = 'none';
+        }
+    });
+    
+    // Set PC Name handler
+    document.getElementById('setPcName').addEventListener('click', function() {
+        const currentName = localStorage.getItem('pcName') || '';
+        const dialog = document.getElementById('pcNameDialog');
+        const input = document.getElementById('pcNameInput');
+        
+        input.value = currentName;
+        dialog.style.display = 'flex';
+        input.focus();
+        input.select();
+        
+        document.getElementById('contextMenu').style.display = 'none';
+    });
+    
+    // PC Name dialog handlers
+    document.getElementById('pcNameOk').addEventListener('click', function() {
+        const input = document.getElementById('pcNameInput');
+        const newName = input.value.trim();
+        
+        if (newName) {
+            localStorage.setItem('pcName', newName);
+            console.log('✅ PC Name saved:', newName);
+            
+            // Επανασύνδεση με νέο hostname
+            if (typeof socket !== 'undefined' && socket && socket.connected) {
+                socket.emit('updateHostname', { hostname: newName });
+                console.log('🔄 Sent hostname update to server:', newName);
+            }
+        }
+        
+        document.getElementById('pcNameDialog').style.display = 'none';
+    });
+    
+    document.getElementById('pcNameCancel').addEventListener('click', function() {
+        document.getElementById('pcNameDialog').style.display = 'none';
+    });
+    
+    // Enter key support
+    document.getElementById('pcNameInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('pcNameOk').click();
+        } else if (e.key === 'Escape') {
+            document.getElementById('pcNameCancel').click();
+        }
+    });
+});
+
+// Custom dialog function
+function showCustomDialog(title, message, type = 'info') {
+    // Remove any existing dialog
+    const existingDialog = document.getElementById('customDialog');
+    if (existingDialog) {
+        existingDialog.remove();
+    }
+    
+    // Create dialog
+    const dialog = document.createElement('div');
+    dialog.id = 'customDialog';
+    dialog.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    // Icon based on type
+    let icon = '💬';
+    let titleColor = '#3498db';
+    if (type === 'warning') {
+        icon = '⚠️';
+        titleColor = '#f39c12';
+    } else if (type === 'error') {
+        icon = '❌';
+        titleColor = '#e74c3c';
+    }
+    
+    dialog.innerHTML = `
+        <div style="
+            background: #2c3e50;
+            padding: 25px;
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 400px;
+            margin: 20px;
+        ">
+            <h3 style="margin: 0 0 15px 0; color: ${titleColor}; font-size: 18px;">${icon} ${title}</h3>
+            <p style="margin: 0 0 20px 0; line-height: 1.4; color: #ecf0f1; font-size: 14px;">${message}</p>
+            <button onclick="closeCustomDialog()" style="
+                background: #27ae60;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='#229954'" onmouseout="this.style.background='#27ae60'">
+                OK
+            </button>
+        </div>
+    `;
+    
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(dialog);
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+        closeCustomDialog();
+    }, 5000);
+}
+
+function closeCustomDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+        dialog.style.animation = 'fadeOut 0.2s ease';
+        setTimeout(() => {
+            dialog.remove();
+        }, 200);
+    }
+}
+
+// ΓΕΜΗ API Integration για Company Autocomplete
+let searchTimeout;
+let selectedCompanyIndex = -1;
+let companiesCache = [];
+let searchCache = new Map(); // Client-side cache για 8 calls/min rate limit
+
+// Search companies από ΓΕΜΗ API (Ελλάδα)
+async function searchGemiCompanies(query) {
+    try {
+        console.log('🇬🇷 ΓΕΜΗ API call για:', query);
+        const response = await fetch(`/api/gemi/search-companies?name=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'API error');
+        }
+        
+        // Add country flag and source to companies, prioritize distinctive title
+        return (data.companies || []).map(company => ({
+            ...company,
+            // Use distinctive title (coTitlesEl) if available, fallback to company name (coNameEl)
+            name: (company.coTitlesEl && company.coTitlesEl.length > 0) ? company.coTitlesEl[0] : company.coNameEl,
+            originalName: company.coNameEl, // Keep original name for reference
+            distinctiveTitle: company.coTitlesEl ? company.coTitlesEl[0] : null,
+            country: 'Greece',
+            source: 'ΓΕΜΗ',
+            flag: '🇬🇷'
+        }));
+        
+    } catch (error) {
+        console.error('❌ ΓΕΜΗ API Error:', error);
+        return [];
+    }
+}
+
+// Search companies από INSEE API (Γαλλία)
+async function searchInseeCompanies(query) {
+    try {
+        console.log('🇫🇷 INSEE API call για:', query);
+        const response = await fetch(`/api/insee/search-companies?name=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'API error');
+        }
+        
+        // Add country flag and source to companies  
+        return (data.companies || []).map(company => ({
+            ...company,
+            country: 'France',
+            source: 'INSEE',
+            flag: '🇫🇷'
+        }));
+        
+    } catch (error) {
+        console.error('❌ INSEE API Error:', error);
+        return [];
+    }
+}
+
+// Search companies από Danish CVR API
+async function searchDanishCompanies(query) {
+    try {
+        console.log('🇩🇰 CVR API call για:', query);
+        const response = await fetch(`/api/cvr/search-companies?name=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'API error');
+        }
+        
+        // Add country flag and source to companies  
+        return (data.companies || []).map(company => ({
+            ...company,
+            country: 'Denmark',
+            source: 'CVR',
+            flag: '🇩🇰'
+        }));
+        
+    } catch (error) {
+        console.error('❌ CVR API Error:', error);
+        return [];
+    }
+}
+
+// Finnish YTJ API search
+async function searchYtjCompanies(query) {
+    try {
+        console.log('🇫🇮 YTJ API call για:', query);
+        const response = await fetch(`/api/ytj/search-companies?name=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.success || !data.companies) {
+            console.warn('🇫🇮 YTJ API returned no results');
+            return [];
+        }
+        
+        console.log(`✅ YTJ API επέστρεψε ${data.companies.length} αποτελέσματα`);
+        
+        return data.companies.map(company => ({
+            name: company.name,
+            address: company.address || '',
+            businessId: company.businessId || '',
+            country: 'Finland',
+            source: 'YTJ',
+            flag: '🇫🇮'
+        }));
+        
+    } catch (error) {
+        console.error('❌ YTJ API Error:', error);
+        return [];
+    }
+}
+
+// Dutch KVK API removed - test API only contains dummy data
+
+
+// Main dual search function (ΓΕΜΗ + INSEE)
+async function searchCompanies(query) {
+    if (query.length < 3) {
+        hideAutocomplete();
+        return;
+    }
+
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    
+    // Έλεγχος cache πρώτα με language-specific key
+    const cacheKey = `${currentFormLanguage}-${query.toLowerCase()}`;
+    if (searchCache.has(cacheKey)) {
+        console.log(`📦 Cache hit για ${currentFormLanguage}:`, query);
+        companiesCache = searchCache.get(cacheKey);
+        displayCompanySuggestions(companiesCache);
+        dropdown.style.display = 'block';
+        return;
+    }
+    
+    // Show appropriate loading message βάσει γλώσσας
+    const loadingMessages = {
+        'el': '🔍 Αναζήτηση στο ελληνικό ΓΕΜΗ...',
+        'fr': '🔍 Recherche dans INSEE France...',
+        'da': '🔍 Søgning i dansk CVR...',
+        'fi': '🔍 Haku suomalaisesta YTJ:stä...',
+        'en': '🔍 Company search not available',
+        'de': '🔍 Unternehmenssuche nicht verfügbar',
+        'es': '🔍 Búsqueda de empresas no disponible',
+        'it': '🔍 Ricerca aziende non disponibile',
+        'uk': '🔍 Пошук компаній недоступний',
+        'nl': '🔍 Bedrijfszoeken niet beschikbaar',
+        'pt': '🔍 Pesquisa de empresas não disponível',
+        'ro': '🔍 Căutarea companiilor nu este disponibilă',
+        'hr': '🔍 Pretraživanje tvrtki nije dostupno',
+        'pl': '🔍 Wyszukiwanie firm niedostępne',
+        'lv': '🔍 Uzņēmumu meklēšana nav pieejama',
+        'sl': '🔍 Iskanje podjetij ni na voljo',
+        'et': '🔍 Ettevõtete otsing pole saadaval',
+        'sv': '🔍 Företagssökning inte tillgänglig',
+        'cs': '🔍 Vyhledávání společností není dostupné',
+        'hu': '🔍 Céglekérdezés nem elérhető',
+        'lt': '🔍 Įmonių paieška nepasiekiama',
+        'sk': '🔍 Vyhľadávanie spoločností nie je dostupné',
+        'bg': '🔍 Търсене на компании не е налично',
+        'mt': '🔍 Tfittxija tal-kumpaniji mhix disponibbli'
+    };
+    dropdown.innerHTML = `<div class="loading-indicator">${loadingMessages[currentFormLanguage] || loadingMessages['el']}</div>`;
+    dropdown.style.display = 'block';
+
+    try {
+        let companies = [];
+        
+        // Language-specific API calls
+        if (currentFormLanguage === 'el') {
+            console.log('🇬🇷 ΓΕΜΗ search για:', query);
+            companies = await searchGemiCompanies(query);
+            console.log(`✅ Greek companies found: ${companies.length}`);
+        } else if (currentFormLanguage === 'fr') {
+            console.log('🇫🇷 INSEE search για:', query);
+            companies = await searchInseeCompanies(query);
+            console.log(`✅ French companies found: ${companies.length}`);
+        } else if (currentFormLanguage === 'en') {
+            // English fallback - no company search
+            console.log('🇺🇸 English: No company search available');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Company search not available in English</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'de') {
+            // German fallback - no company search
+            console.log('🇩🇪 Deutsch: Keine Unternehmenssuche verfügbar');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Unternehmenssuche nicht verfügbar auf Deutsch</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'es') {
+            // Spanish fallback - no company search
+            console.log('🇪🇸 Español: Búsqueda de empresas no disponible');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Búsqueda de empresas no disponible en español</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'it') {
+            // Italian fallback - no company search
+            console.log('🇮🇹 Italiano: Ricerca aziende non disponibile');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Ricerca aziende non disponibile in italiano</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'da') {
+            // Danish - CVR API search
+            console.log('🇩🇰 Danish: CVR API search for:', query);
+            companies = await searchDanishCompanies(query);
+        } else if (currentFormLanguage === 'uk') {
+            // Ukrainian fallback - no company search API available yet
+            console.log('🇺🇦 Українська: Пошук компаній недоступний');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Пошук компаній недоступний українською мовою</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'nl') {
+            // Dutch fallback - test API only contains dummy data, not real companies
+            console.log('🇳🇱 Nederlands: Bedrijfszoeken niet beschikbaar');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Bedrijfszoeken niet beschikbaar in het Nederlands</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'pt') {
+            // Portuguese fallback - no free API available
+            console.log('🇵🇹 Português: Pesquisa de empresas não disponível');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Pesquisa de empresas não disponível em português</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'es') {
+            // Spanish fallback - no company search
+            console.log('🇪🇸 Español: Búsqueda de empresas no disponible');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Búsqueda de empresas no disponible en español</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'it') {
+            // Italian fallback - no company search
+            console.log('🇮🇹 Italiano: Ricerca aziende non disponibile');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Ricerca aziende non disponibile in italiano</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'ro') {
+            // Romanian fallback - no free API available
+            console.log('🇷🇴 Română: Căutare companii nu este disponibilă');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Căutarea companiilor nu este disponibilă în română</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'hr') {
+            // Croatian fallback - no free API available
+            console.log('🇭🇷 Hrvatski: Pretraživanje tvrtki nije dostupno');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Pretraživanje tvrtki nije dostupno na hrvatskom</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'pl') {
+            // Polish fallback - no free API available
+            console.log('🇵🇱 Polski: Wyszukiwanie firm nie jest dostępne');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Wyszukiwanie firm nie jest dostępne po polsku</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'lv') {
+            // Latvian fallback - no free API available
+            console.log('🇱🇻 Latviešu: Uzņēmumu meklēšana nav pieejama');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Uzņēmumu meklēšana nav pieejama latviešu valodā</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'sl') {
+            // Slovenian fallback - no free API available
+            console.log('🇸🇮 Slovenščina: Iskanje podjetij ni na voljo');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Iskanje podjetij ni na voljo v slovenščini</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'et') {
+            // Estonian fallback - no free API available
+            console.log('🇪🇪 Eesti: Ettevõtete otsing pole saadaval');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Ettevõtete otsing pole eesti keeles saadaval</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'fi') {
+            console.log('🇫🇮 YTJ search για:', query);
+            companies = await searchYtjCompanies(query);
+            console.log(`✅ Finnish companies found: ${companies.length}`);
+        } else if (currentFormLanguage === 'sv') {
+            // Swedish fallback - no free API available
+            console.log('🇸🇪 Svenska: Företagssökning inte tillgänglig');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Företagssökning inte tillgänglig på svenska</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'cs') {
+            // Czech fallback - no free API available
+            console.log('🇨🇿 Čeština: Vyhledávání společností není dostupné');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Vyhledávání společností není dostupné v češtině</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'hu') {
+            // Hungarian fallback - no free API available
+            console.log('🇭🇺 Magyar: Céglekérdezés nem elérhető');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Céglekérdezés nem elérhető magyar nyelven</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'lt') {
+            // Lithuanian fallback - no free API available
+            console.log('🇱🇹 Lietuvių: Įmonių paieška nepasiekiama');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Įmonių paieška nepasiekiama lietuvių kalba</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'sk') {
+            // Slovak fallback - no free API available
+            console.log('🇸🇰 Slovenčina: Vyhľadávanie spoločností nie je dostupné');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Vyhľadávanie spoločností nie je dostupné v slovenčine</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'bg') {
+            // Bulgarian fallback - no free API available
+            console.log('🇧🇬 Български: Търсене на компании не е налично');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Търсене на компании не е налично на български</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        } else if (currentFormLanguage === 'mt') {
+            // Maltese fallback - no free API available
+            console.log('🇲🇹 Malti: Tfittxija tal-kumpaniji mhix disponibbli');
+            companies = [];
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Tfittxija tal-kumpaniji mhix disponibbli bil-Malti</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        }
+        
+        if (companies.length === 0) {
+            dropdown.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Δεν βρέθηκαν εταιρείες / No companies found</div>';
+            setTimeout(() => hideAutocomplete(), 2000);
+            return;
+        }
+        
+        companiesCache = companies;
+        
+        // Αποθήκευση στο cache με 5-minute TTL
+        searchCache.set(cacheKey, companiesCache);
+        setTimeout(() => searchCache.delete(cacheKey), 5 * 60 * 1000);
+        
+        displayCompanySuggestions(companiesCache);
+        
+    } catch (error) {
+        console.error('❌ Company Search Error:', error);
+        dropdown.innerHTML = '<div class="no-results">❌ Σφάλμα αναζήτησης - δοκιμάστε ξανά</div>';
+    }
+}
+
+function displayCompanySuggestions(companies) {
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    selectedCompanyIndex = -1;
+    
+    if (!companies || companies.length === 0) {
+        dropdown.innerHTML = '<div class="no-results">❌ Δεν βρέθηκαν εταιρείες</div>';
+        return;
+    }
+
+    const html = companies.map((company, index) => {
+        // Handle both ΓΕΜΗ and INSEE formats
+        const name = company.coNameEl || company.name || 'Άγνωστο όνομα';
+        const city = company.city || '';
+        const flag = company.flag || '🏢';
+        const source = company.source || '';
+        
+        let details = [];
+        
+        if (company.source === 'ΓΕΜΗ') {
+            // Greek company format
+            const legalType = company.legalType?.descr || '';
+            const afm = company.afm || '';
+            
+            if (legalType) details.push(legalType);
+            if (city) details.push(city);  
+            if (afm) details.push(`ΑΦΜ: ${afm}`);
+        } else if (company.source === 'INSEE') {
+            // French company format
+            const postalCode = company.postalCode || '';
+            const siret = company.siret || '';
+            
+            if (city && postalCode) details.push(`${city} ${postalCode}`);
+            else if (city) details.push(city);
+            if (siret) details.push(`SIRET: ${siret}`);
+        }
+        
+        return `
+            <div class="autocomplete-item" data-index="${index}">
+                <div class="company-name">${flag} ${name} <span class="company-source">(${source})</span></div>
+                ${details.length > 0 ? `<div class="company-details">${details.join(' • ')}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    dropdown.innerHTML = html;
+    
+    // Add click event listeners
+    dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const index = parseInt(item.getAttribute('data-index'));
+            selectCompany(companies[index]);
+        });
+    });
+}
+
+function selectCompany(company) {
+    const input = document.getElementById('company');
+    
+    // Handle both ΓΕΜΗ and INSEE formats
+    const companyName = company.coNameEl || company.name || 'Άγνωστο όνομα';
+    input.value = companyName;
+    
+    hideAutocomplete();
+}
+
+function hideAutocomplete() {
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    dropdown.style.display = 'none';
+    selectedCompanyIndex = -1;
+}
+
+function highlightCompany(index) {
+    const items = document.querySelectorAll('.autocomplete-item');
+    
+    // Remove previous highlight
+    items.forEach(item => item.classList.remove('highlighted'));
+    
+    // Add new highlight
+    if (index >= 0 && index < items.length) {
+        selectedCompanyIndex = index;
+        items[index].classList.add('highlighted');
+        items[index].scrollIntoView({ block: 'nearest' });
+    }
+}
+
+// Setup autocomplete event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const companyInput = document.getElementById('company');
+    
+    if (companyInput) {
+        // Input event for search
+        companyInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchCompanies(e.target.value.trim());
+            }, 800); // 800ms debounce για rate limiting
+        });
+
+        // Keyboard navigation
+        companyInput.addEventListener('keydown', (e) => {
+            const dropdown = document.getElementById('autocomplete-dropdown');
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+            
+            if (dropdown.style.display === 'none' || items.length === 0) return;
+            
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    highlightCompany(selectedCompanyIndex + 1);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    highlightCompany(selectedCompanyIndex - 1);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selectedCompanyIndex >= 0 && companiesCache[selectedCompanyIndex]) {
+                        selectCompany(companiesCache[selectedCompanyIndex]);
+                    }
+                    break;
+                case 'Escape':
+                    hideAutocomplete();
+                    break;
+            }
+        });
+
+        // Hide on focus loss
+        companyInput.addEventListener('blur', () => {
+            // Delay hiding to allow click events
+            setTimeout(hideAutocomplete, 150);
+        });
+
+        // Show dropdown on focus if has content
+        companyInput.addEventListener('focus', () => {
+            if (companyInput.value.trim().length >= 3) {
+                searchCompanies(companyInput.value.trim());
+            }
+        });
+    }
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const container = e.target.closest('.autocomplete-container');
+        if (!container) {
+            hideAutocomplete();
+        }
+    });
+});
+
+    </script>
+
+<!-- i18next Internationalization -->
+<script src="https://cdn.jsdelivr.net/npm/i18next@23.12.2/i18next.min.js"></script>
+
+<script>
+// Language management for Questions Form
+let currentFormLanguage = 'el'; // Default to Greek
+
+// Load language preference from localStorage
+function loadFormLanguage() {
+    const saved = localStorage.getItem('qform-language');
+    if (saved && ['el', 'en', 'fr', 'de', 'es', 'it'].includes(saved)) {
+        currentFormLanguage = saved;
+    }
+}
+
+// Save language preference to localStorage
+function saveFormLanguage(lang) {
+    localStorage.setItem('qform-language', lang);
+}
+
+// Translation resources
+const formTranslations = {
+    el: {
+        title: "Ερωτήσεις προς Ομιλητές",
+        subtitle: "Υποβάλετε την ερώτησή σας",
+        successMessage: "✅ Η ερώτησή σας υποβλήθηκε επιτυχώς! Θα εξεταστεί από τη διοργάνωση.",
+        labels: {
+            name: "Όνομα *",
+            company: "Εταιρεία *", 
+            department: "Τμήμα",
+            email: "E-Mail",
+            targetSpeaker: "Ερώτηση προς *",
+            subject: "Θέμα *",
+            question: "Κείμενο Ερώτησης *"
+        },
+        placeholders: {
+            company: "Πληκτρολογήστε το όνομα της εταιρείας...",
+            department: "π.χ. Λογιστήριο, Πωλήσεις",
+            email: "Αν το ερώτημα σας δεν απαντηθεί προφορικά",
+            subject: "π.χ. Δαπάνες Αναλωσίμων",
+            questionText: "π.χ. Πώς κάνουμε αντιλογισμούς για τα αναλώσιμα που χρησιμοποιούμε στην παραγωγή;"
+        },
+        options: {
+            loadingSpeakers: "⏳ Φόρτωση ομιλητών...",
+            generalQuestion: "Γενική Ερώτηση (Όλοι)",
+            selectSpeaker: "Επιλέξτε ομιλητή..."
+        },
+        charCounter: "χαρακτήρες",
+        submitButton: "📤 Υποβολή Ερώτησης"
+    },
+    en: {
+        title: "Questions to Speakers",
+        subtitle: "Submit your question",
+        successMessage: "✅ Your question has been submitted successfully! It will be reviewed by the organizers.",
+        labels: {
+            name: "Name *",
+            company: "Company *",
+            department: "Department", 
+            email: "E-Mail",
+            targetSpeaker: "Question to *",
+            subject: "Subject *",
+            question: "Question Text *"
+        },
+        placeholders: {
+            company: "Type the company name...",
+            department: "e.g. Accounting, Sales",
+            email: "If your question is not answered verbally",
+            subject: "e.g. Consumables Expenses",
+            questionText: "e.g. How do we account for consumables used in production?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Loading speakers...",
+            generalQuestion: "General Question (All)",
+            selectSpeaker: "Select speaker..."
+        },
+        charCounter: "characters", 
+        submitButton: "📤 Submit Question"
+    },
+    fr: {
+        title: "Questions aux Intervenants",
+        subtitle: "Soumettez votre question",
+        successMessage: "✅ Votre question a été soumise avec succès ! Elle sera examinée par les organisateurs.",
+        labels: {
+            name: "Nom *",
+            company: "Entreprise *",
+            department: "Département", 
+            email: "E-Mail",
+            targetSpeaker: "Question à *",
+            subject: "Sujet *",
+            question: "Texte de la Question *"
+        },
+        placeholders: {
+            company: "Tapez le nom de l'entreprise...",
+            department: "ex. Comptabilité, Ventes",
+            email: "Si votre question n'est pas répondue oralement",
+            subject: "ex. Dépenses de Consommables",
+            questionText: "ex. Comment comptabilisons-nous les consommables utilisés en production ?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Chargement des intervenants...",
+            generalQuestion: "Question Générale (Tous)",
+            selectSpeaker: "Sélectionner un intervenant..."
+        },
+        charCounter: "caractères", 
+        submitButton: "📤 Soumettre la Question"
+    },
+    de: {
+        title: "Fragen an Referenten",
+        subtitle: "Stellen Sie Ihre Frage",
+        successMessage: "✅ Ihre Frage wurde erfolgreich eingereicht! Sie wird von den Organisatoren geprüft.",
+        labels: {
+            name: "Name *",
+            company: "Unternehmen *",
+            department: "Abteilung", 
+            email: "E-Mail",
+            targetSpeaker: "Frage an *",
+            subject: "Betreff *",
+            question: "Fragetext *"
+        },
+        placeholders: {
+            company: "Geben Sie den Firmennamen ein...",
+            department: "z.B. Buchhaltung, Vertrieb",
+            email: "Falls Ihre Frage nicht mündlich beantwortet wird",
+            subject: "z.B. Verbrauchsmaterialkosten",
+            questionText: "z.B. Wie verbuchen wir Verbrauchsmaterialien, die in der Produktion verwendet werden?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Referenten werden geladen...",
+            generalQuestion: "Allgemeine Frage (Alle)",
+            selectSpeaker: "Referenten auswählen..."
+        },
+        charCounter: "Zeichen", 
+        submitButton: "📤 Frage Einreichen"
+    },
+    es: {
+        title: "Preguntas a los Ponentes",
+        subtitle: "Envía tu pregunta",
+        successMessage: "✅ ¡Tu pregunta ha sido enviada exitosamente! Será revisada por los organizadores.",
+        labels: {
+            name: "Nombre *",
+            company: "Empresa *",
+            department: "Departamento", 
+            email: "E-Mail",
+            targetSpeaker: "Pregunta para *",
+            subject: "Asunto *",
+            question: "Texto de la Pregunta *"
+        },
+        placeholders: {
+            company: "Escriba el nombre de la empresa...",
+            department: "ej. Contabilidad, Ventas",
+            email: "Si tu pregunta no es respondida verbalmente",
+            subject: "ej. Gastos de Suministros",
+            questionText: "ej. ¿Cómo contabilizamos los suministros utilizados en la producción?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Cargando ponentes...",
+            generalQuestion: "Pregunta General (Todos)",
+            selectSpeaker: "Seleccionar ponente..."
+        },
+        charCounter: "caracteres", 
+        submitButton: "📤 Enviar Pregunta"
+    },
+    it: {
+        title: "Domande ai Relatori",
+        subtitle: "Invia la tua domanda",
+        successMessage: "✅ La tua domanda è stata inviata con successo! Sarà esaminata dagli organizzatori.",
+        labels: {
+            name: "Nome *",
+            company: "Azienda *",
+            department: "Dipartimento", 
+            email: "E-Mail",
+            targetSpeaker: "Domanda per *",
+            subject: "Oggetto *",
+            question: "Testo della Domanda *"
+        },
+        placeholders: {
+            company: "Digita il nome dell'azienda...",
+            department: "es. Contabilità, Vendite",
+            email: "Se la tua domanda non riceve risposta verbale",
+            subject: "es. Spese per Materiali di Consumo",
+            questionText: "es. Come contabilizziamo i materiali di consumo utilizzati nella produzione?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Caricamento relatori...",
+            generalQuestion: "Domanda Generale (Tutti)",
+            selectSpeaker: "Seleziona relatore..."
+        },
+        charCounter: "caratteri", 
+        submitButton: "📤 Invia Domanda"
+    },
+    da: {
+        title: "Spørgsmål til Talere",
+        subtitle: "Indsend dit spørgsmål",
+        successMessage: "✅ Dit spørgsmål er indsendt! Det vil blive gennemgået af arrangørerne.",
+        labels: {
+            name: "Navn *",
+            company: "Virksomhed *",
+            department: "Afdeling", 
+            email: "E-Mail",
+            targetSpeaker: "Spørgsmål til *",
+            subject: "Emne *",
+            question: "Spørgsmålstekst *"
+        },
+        placeholders: {
+            company: "Indtast virksomhedens navn...",
+            department: "f.eks. Regnskab, Salg",
+            email: "Hvis dit spørgsmål ikke besvares mundtligt",
+            subject: "f.eks. Forbrugsudgifter",
+            questionText: "f.eks. Hvordan bogfører vi forbrugsvarer brugt i produktionen?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Indlæser talere...",
+            generalQuestion: "Generelt Spørgsmål (Alle)",
+            selectSpeaker: "Vælg taler..."
+        },
+        charCounter: "tegn", 
+        submitButton: "📤 Indsend Spørgsmål"
+    },
+    uk: {
+        title: "Питання до Доповідачів",
+        subtitle: "Подайте своє питання",
+        successMessage: "✅ Ваше питання подано успішно! Воно буде розглянуто організаторами.",
+        labels: {
+            name: "Ім'я *",
+            company: "Компанія *",
+            department: "Відділ", 
+            email: "E-Mail",
+            targetSpeaker: "Питання до *",
+            subject: "Тема *",
+            question: "Текст Питання *"
+        },
+        placeholders: {
+            company: "Введіть назву компанії...",
+            department: "наприклад Бухгалтерія, Продажі",
+            email: "Якщо ваше питання не буде дано усно",
+            subject: "наприклад Витрати на Матеріали",
+            questionText: "наприклад Як ми обліковуємо матеріали, використані у виробництві?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Завантаження доповідачів...",
+            generalQuestion: "Загальне Питання (Всі)",
+            selectSpeaker: "Оберіть доповідача..."
+        },
+        charCounter: "символів", 
+        submitButton: "📤 Подати Питання"
+    },
+    nl: {
+        title: "Vragen aan Sprekers",
+        subtitle: "Stel uw vraag",
+        successMessage: "✅ Uw vraag is succesvol ingediend! Het zal beoordeeld worden door de organisatoren.",
+        labels: {
+            name: "Naam *",
+            company: "Bedrijf *",
+            department: "Afdeling", 
+            email: "E-Mail",
+            targetSpeaker: "Vraag aan *",
+            subject: "Onderwerp *",
+            question: "Vraag Tekst *"
+        },
+        placeholders: {
+            company: "Voer de bedrijfsnaam in...",
+            department: "bijv. Boekhouding, Verkoop",
+            email: "Als uw vraag niet mondeling wordt beantwoord",
+            subject: "bijv. Verbruikskosten",
+            questionText: "bijv. Hoe boeken we verbruiksgoederen die in productie worden gebruikt?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Sprekers laden...",
+            generalQuestion: "Algemene Vraag (Alle)",
+            selectSpeaker: "Selecteer spreker..."
+        },
+        charCounter: "tekens", 
+        submitButton: "📤 Vraag Indienen"
+    },
+    pt: {
+        title: "Perguntas aos Oradores",
+        subtitle: "Envie sua pergunta",
+        successMessage: "✅ Sua pergunta foi enviada com sucesso! Será analisada pelos organizadores.",
+        labels: {
+            name: "Nome *",
+            company: "Empresa *",
+            department: "Departamento", 
+            email: "E-Mail",
+            targetSpeaker: "Pergunta para *",
+            subject: "Assunto *",
+            question: "Texto da Pergunta *"
+        },
+        placeholders: {
+            company: "Digite o nome da empresa...",
+            department: "ex. Contabilidade, Vendas",
+            email: "Se sua pergunta não for respondida verbalmente",
+            subject: "ex. Despesas de Consumíveis",
+            questionText: "ex. Como contabilizamos consumíveis usados na produção?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Carregando oradores...",
+            generalQuestion: "Pergunta Geral (Todos)",
+            selectSpeaker: "Selecionar orador..."
+        },
+        charCounter: "caracteres", 
+        submitButton: "📤 Enviar Pergunta"
+    },
+    ro: {
+        title: "Întrebări pentru Vorbitori",
+        subtitle: "Trimiteți întrebarea dumneavoastră",
+        successMessage: "✅ Întrebarea dumneavoastră a fost trimisă cu succes! Va fi examinată de organizatori.",
+        labels: {
+            name: "Nume *",
+            company: "Companie *",
+            department: "Departament", 
+            email: "E-Mail",
+            targetSpeaker: "Întrebare pentru *",
+            subject: "Subiect *",
+            question: "Textul Întrebării *"
+        },
+        placeholders: {
+            company: "Introduceți numele companiei...",
+            department: "ex. Contabilitate, Vânzări",
+            email: "Dacă întrebarea nu este răspunsă verbal",
+            subject: "ex. Cheltuieli cu Consumabile",
+            questionText: "ex. Cum contabilizăm consumabilele folosite în producție?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Se încarcă voritorii...",
+            generalQuestion: "Întrebare Generală (Toți)",
+            selectSpeaker: "Selectați vorbitor..."
+        },
+        charCounter: "caractere", 
+        submitButton: "📤 Trimite Întrebarea"
+    },
+    hr: {
+        title: "Pitanja za Govornike",
+        subtitle: "Pošaljite svoje pitanje",
+        successMessage: "✅ Vaše pitanje je uspješno poslano! Bit će pregledano od strane organizatora.",
+        labels: {
+            name: "Ime *",
+            company: "Tvrtka *",
+            department: "Odjel", 
+            email: "E-Mail",
+            targetSpeaker: "Pitanje za *",
+            subject: "Predmet *",
+            question: "Tekst Pitanja *"
+        },
+        placeholders: {
+            company: "Unesite naziv tvrtke...",
+            department: "npr. Računovodstvo, Prodaja",
+            email: "Ako vaše pitanje nije odgovoreno usmeno",
+            subject: "npr. Troškovi Potrošnog Materijala",
+            questionText: "npr. Kako knjižimo potrošni materijal korišten u proizvodnji?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Učitavaju se govornici...",
+            generalQuestion: "Opće Pitanje (Svi)",
+            selectSpeaker: "Odaberite govornika..."
+        },
+        charCounter: "znakova", 
+        submitButton: "📤 Pošalji Pitanje"
+    },
+    pl: {
+        title: "Pytania do Prelegentów",
+        subtitle: "Wyślij swoje pytanie",
+        successMessage: "✅ Twoje pytanie zostało pomyślnie wysłane! Zostanie przeanalizowane przez organizatorów.",
+        labels: {
+            name: "Imię *",
+            company: "Firma *",
+            department: "Dział", 
+            email: "E-Mail",
+            targetSpeaker: "Pytanie do *",
+            subject: "Temat *",
+            question: "Treść Pytania *"
+        },
+        placeholders: {
+            company: "Wprowadź nazwę firmy...",
+            department: "np. Księgowość, Sprzedaż",
+            email: "Jeśli pytanie nie będzie odpowiedziane ustnie",
+            subject: "np. Wydatki na Materiały Eksploatacyjne",
+            questionText: "np. Jak księgujemy materiały eksploatacyjne używane w produkcji?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Ładowanie prelegentów...",
+            generalQuestion: "Pytanie Ogólne (Wszyscy)",
+            selectSpeaker: "Wybierz prelegenta..."
+        },
+        charCounter: "znaków", 
+        submitButton: "📤 Wyślij Pytanie"
+    },
+    lv: {
+        title: "Jautājumi lektoriem",
+        subtitle: "Nosūtīt savu jautājumu",
+        successMessage: "✅ Jūsu jautājums ir veiksmīgi nosūtīts! To izskatīs organizatori.",
+        labels: {
+            name: "Vārds *",
+            company: "Uzņēmums *",
+            department: "Nodaļa", 
+            email: "E-pasts",
+            targetSpeaker: "Jautājums priekš *",
+            subject: "Tēma *",
+            question: "Jautājuma teksts *"
+        },
+        placeholders: {
+            company: "Ievadiet uzņēmuma nosaukumu...",
+            department: "piemēram, Grāmatvedība, Pārdošana",
+            email: "Ja jautājums netiks atbildēts mutiski",
+            subject: "piemēram, Patēriņa materiālu izmaksas",
+            questionText: "piemēram, Kā mēs grāmatojam ražošanā izlietotos patēriņa materiālus?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Ielādē lektorus...",
+            generalQuestion: "Vispārīgs jautājums (Visi)",
+            selectSpeaker: "Izvēlēties lektoru..."
+        },
+        charCounter: "rakstzīmes", 
+        submitButton: "📤 Nosūtīt jautājumu"
+    },
+    sl: {
+        title: "Vprašanja za Govorce",
+        subtitle: "Pošljite svoje vprašanje",
+        successMessage: "✅ Vaše vprašanje je bilo uspešno poslano! Pregledali ga bodo organizatorji.",
+        labels: {
+            name: "Ime *",
+            company: "Podjetje *",
+            department: "Oddelek", 
+            email: "E-pošta",
+            targetSpeaker: "Vprašanje za *",
+            subject: "Zadeva *",
+            question: "Besedilo vprašanja *"
+        },
+        placeholders: {
+            company: "Vnesite ime podjetja...",
+            department: "npr. Računovodstvo, Prodaja",
+            email: "Če na vprašanje ne bo odgovorjeno ustno",
+            subject: "npr. Stroški potrošnega materiala",
+            questionText: "npr. Kako knjižimo potrošni material, ki se uporablja v proizvodnji?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Nalaganje govorcev...",
+            generalQuestion: "Splošno vprašanje (Vsi)",
+            selectSpeaker: "Izberite govorca..."
+        },
+        charCounter: "znakov", 
+        submitButton: "📤 Pošlji vprašanje"
+    },
+    et: {
+        title: "Küsimused Esinejatele",
+        subtitle: "Saada oma küsimus",
+        successMessage: "✅ Teie küsimus on edukalt saadetud! Korraldajad vaatavad selle üle.",
+        labels: {
+            name: "Nimi *",
+            company: "Ettevõte *",
+            department: "Osakond", 
+            email: "E-post",
+            targetSpeaker: "Küsimus *",
+            subject: "Teema *",
+            question: "Küsimuse tekst *"
+        },
+        placeholders: {
+            company: "Sisestage ettevõtte nimi...",
+            department: "nt. Raamatupidamine, Müük",
+            email: "Kui küsimusele ei vastata suuliselt",
+            subject: "nt. Tarbematerjali kulud",
+            questionText: "nt. Kuidas me arvestame tootmises kasutatud tarbematerjali?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Esinejate laadimine...",
+            generalQuestion: "Üldine küsimus (Kõik)",
+            selectSpeaker: "Vali esineja..."
+        },
+        charCounter: "märki", 
+        submitButton: "📤 Saada küsimus"
+    },
+    fi: {
+        title: "Kysymyksiä Puhujille",
+        subtitle: "Lähetä kysymyksesi",
+        successMessage: "✅ Kysymyksesi on lähetetty onnistuneesti! Järjestäjät tarkistavat sen.",
+        labels: {
+            name: "Nimi *",
+            company: "Yritys *",
+            department: "Osasto",
+            email: "Sähköposti",
+            targetSpeaker: "Kysymys *",
+            subject: "Aihe *",
+            question: "Kysymyksen teksti *"
+        },
+        placeholders: {
+            company: "Syötä yrityksen nimi...",
+            department: "esim. Kirjanpito, Myynti",
+            email: "Jos kysymykseen ei vastata suullisesti",
+            subject: "esim. Kulutustarvikkeiden kustannukset",
+            questionText: "esim. Miten laskemme tuotannossa käytetyt kulutustarvikkeet?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Ladataan puhujia...",
+            generalQuestion: "Yleinen kysymys (Kaikki)",
+            selectSpeaker: "Valitse puhuja..."
+        },
+        charCounter: "merkkiä",
+        submitButton: "📤 Lähetä kysymys"
+    },
+    sv: {
+        title: "Frågor till Talare",
+        subtitle: "Skicka din fråga",
+        successMessage: "✅ Din fråga har skickats framgångsrikt! Organisatörerna kommer att granska den.",
+        labels: {
+            name: "Namn *",
+            company: "Företag *",
+            department: "Avdelning",
+            email: "E-post",
+            targetSpeaker: "Fråga *",
+            subject: "Ämne *",
+            question: "Frågetexten *"
+        },
+        placeholders: {
+            company: "Ange företagsnamn...",
+            department: "t.ex. Redovisning, Försäljning",
+            email: "Om frågan inte besvaras muntligt",
+            subject: "t.ex. Förbrukningskostnader",
+            questionText: "t.ex. Hur räknar vi förbrukningsmaterial som används i produktionen?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Laddar talare...",
+            generalQuestion: "Allmän fråga (Alla)",
+            selectSpeaker: "Välj talare..."
+        },
+        charCounter: "tecken",
+        submitButton: "📤 Skicka fråga"
+    },
+    cs: {
+        title: "Otázky pro Řečníky",
+        subtitle: "Pošlete svou otázku",
+        successMessage: "✅ Vaše otázka byla úspěšně odeslána! Organizátoři ji zkontrolují.",
+        labels: {
+            name: "Jméno *",
+            company: "Společnost *",
+            department: "Oddělení",
+            email: "E-mail",
+            targetSpeaker: "Otázka *",
+            subject: "Téma *",
+            question: "Text otázky *"
+        },
+        placeholders: {
+            company: "Zadejte název společnosti...",
+            department: "např. Účetnictví, Prodej",
+            email: "Pokud otázka nebude zodpovězena ústně",
+            subject: "např. Náklady na spotřební materiál",
+            questionText: "např. Jak účtujeme spotřební materiál používaný ve výrobě?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Načítání řečníků...",
+            generalQuestion: "Obecná otázka (Všichni)",
+            selectSpeaker: "Vyberte řečníka..."
+        },
+        charCounter: "znaků",
+        submitButton: "📤 Odeslat otázku"
+    },
+    hu: {
+        title: "Kérdések az Előadókhoz",
+        subtitle: "Küldje el kérdését",
+        successMessage: "✅ A kérdése sikeresen elküldve! A szervezők átnézik.",
+        labels: {
+            name: "Név *",
+            company: "Vállalat *",
+            department: "Részleg",
+            email: "E-mail",
+            targetSpeaker: "Kérdés *",
+            subject: "Tárgy *",
+            question: "Kérdés szövege *"
+        },
+        placeholders: {
+            company: "Adja meg a vállalat nevét...",
+            department: "pl. Könyvelés, Értékesítés",
+            email: "Ha a kérdésre nem válaszolnak szóban",
+            subject: "pl. Fogyóeszköz költségek",
+            questionText: "pl. Hogyan számoljuk el a gyártásban használt fogyóeszközöket?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Előadók betöltése...",
+            generalQuestion: "Általános kérdés (Mindenki)",
+            selectSpeaker: "Válasszon előadót..."
+        },
+        charCounter: "karakter",
+        submitButton: "📤 Kérdés küldése"
+    },
+    lt: {
+        title: "Klausimai Pranešėjams",
+        subtitle: "Pateikite savo klausimą",
+        successMessage: "✅ Jūsų klausimas sėkmingai pateiktas! Organizatoriai jį peržiūrės.",
+        labels: {
+            name: "Vardas *",
+            company: "Įmonė *",
+            department: "Skyrius",
+            email: "El. paštas",
+            targetSpeaker: "Klausimas *",
+            subject: "Tema *",
+            question: "Klausimo tekstas *"
+        },
+        placeholders: {
+            company: "Įveskite įmonės pavadinimą...",
+            department: "pvz. Buhalterija, Pardavimai",
+            email: "Jei į klausimą neatsakoma žodžiu",
+            subject: "pvz. Suvartojamųjų medžiagų išlaidos",
+            questionText: "pvz. Kaip apskaičiuojame gamyboje naudojamas suvartojamąsias medžiagas?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Kraunami pranešėjai...",
+            generalQuestion: "Bendrasis klausimas (Visi)",
+            selectSpeaker: "Pasirinkite pranešėją..."
+        },
+        charCounter: "simbolių",
+        submitButton: "📤 Pateikti klausimą"
+    },
+    sk: {
+        title: "Otázky pre Rečníkov",
+        subtitle: "Pošlite svoju otázku",
+        successMessage: "✅ Vaša otázka bola úspešne odoslaná! Organizátori ju skontrolujú.",
+        labels: {
+            name: "Meno *",
+            company: "Spoločnosť *",
+            department: "Oddelenie",
+            email: "E-mail",
+            targetSpeaker: "Otázka *",
+            subject: "Téma *",
+            question: "Text otázky *"
+        },
+        placeholders: {
+            company: "Zadajte názov spoločnosti...",
+            department: "napr. Účtovníctvo, Predaj",
+            email: "Ak na otázku nebude odpovedané ústne",
+            subject: "napr. Náklady na spotrebný materiál",
+            questionText: "napr. Ako účtujeme spotrebný materiál používaný vo výrobe?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Načítavanie rečníkov...",
+            generalQuestion: "Všeobecná otázka (Všetci)",
+            selectSpeaker: "Vyberte rečníka..."
+        },
+        charCounter: "znakov",
+        submitButton: "📤 Odoslať otázku"
+    },
+    bg: {
+        title: "Въпроси към Лекторите",
+        subtitle: "Изпратете своя въпрос",
+        successMessage: "✅ Вашият въпрос беше изпратен успешно! Организаторите ще го прегледат.",
+        labels: {
+            name: "Име *",
+            company: "Компания *",
+            department: "Отдел",
+            email: "И-мейл",
+            targetSpeaker: "Въпрос *",
+            subject: "Тема *",
+            question: "Текст на въпроса *"
+        },
+        placeholders: {
+            company: "Въведете името на компанията...",
+            department: "напр. Счетоводство, Продажби",
+            email: "Ако въпросът не бъде отговорен устно",
+            subject: "напр. Разходи за консумативи",
+            questionText: "напр. Как отчитаме консумативите, използвани в производството?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Зареждане на лектори...",
+            generalQuestion: "Общ въпрос (Всички)",
+            selectSpeaker: "Изберете лектор..."
+        },
+        charCounter: "знаци",
+        submitButton: "📤 Изпращане на въпрос"
+    },
+    mt: {
+        title: "Mistoqsijiet għall-Kelliem",
+        subtitle: "Ibgħat il-mistoqsija tiegħek",
+        successMessage: "✅ Il-mistoqsija tiegħek intbagħtet b'suċċess! L-organizzaturi se jirreveduha.",
+        labels: {
+            name: "Isem *",
+            company: "Kumpanija *",
+            department: "Dipartiment",
+            email: "E-mail",
+            targetSpeaker: "Mistoqsija *",
+            subject: "Suġġett *",
+            question: "Test tal-mistoqsija *"
+        },
+        placeholders: {
+            company: "Daħħal l-isem tal-kumpanija...",
+            department: "eż. Kontabilità, Bejgħ",
+            email: "Jekyll il-mistoqsija ma titwieġbx bi kliem",
+            subject: "eż. Spejjeż tal-konsumabbli",
+            questionText: "eż. Kif nikkalkula l-konsumabbli użati fil-produzzjoni?"
+        },
+        options: {
+            loadingSpeakers: "⏳ Qed jitgħabbew il-kelliem...",
+            generalQuestion: "Mistoqsija ġenerali (Kulħadd)",
+            selectSpeaker: "Agħżel kelliem..."
+        },
+        charCounter: "karattri",
+        submitButton: "📤 Ibgħat mistoqsija"
+    }
+};
+
+// Initialize i18next for Questions Form
+async function initFormTranslations() {
+    try {
+        loadFormLanguage();
+        
+        await i18next.init({
+            lng: currentFormLanguage,
+            fallbackLng: 'el',
+            resources: {
+                el: { translation: formTranslations.el },
+                en: { translation: formTranslations.en },
+                fr: { translation: formTranslations.fr },
+                de: { translation: formTranslations.de },
+                es: { translation: formTranslations.es },
+                it: { translation: formTranslations.it },
+                da: { translation: formTranslations.da },
+                uk: { translation: formTranslations.uk },
+                nl: { translation: formTranslations.nl },
+                pt: { translation: formTranslations.pt },
+                ro: { translation: formTranslations.ro },
+                hr: { translation: formTranslations.hr },
+                pl: { translation: formTranslations.pl },
+                lv: { translation: formTranslations.lv },
+                sl: { translation: formTranslations.sl },
+                et: { translation: formTranslations.et },
+                fi: { translation: formTranslations.fi },
+                sv: { translation: formTranslations.sv },
+                cs: { translation: formTranslations.cs },
+                hu: { translation: formTranslations.hu },
+                lt: { translation: formTranslations.lt },
+                sk: { translation: formTranslations.sk },
+                bg: { translation: formTranslations.bg },
+                mt: { translation: formTranslations.mt }
+            },
+            interpolation: {
+                escapeValue: false
+            }
+        });
+
+        console.log('✅ Q-Form i18next initialized - Language:', i18next.language);
+        updateFormInterface();
+        updateLanguageSelector();
+        
+    } catch (error) {
+        console.error('❌ Q-Form i18next initialization failed:', error);
+    }
+}
+
+// Update form interface language
+function updateFormInterface() {
+    console.log('🔄 Updating Q-Form interface language to:', i18next.language);
+    
+    // Update document title
+    document.title = i18next.t('title');
+    
+    // Update elements with data-i18n attributes
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = i18next.t(key);
+        
+        // Debug logging
+        if (translation === key) {
+            console.warn(`Q-Form translation missing for key: ${key}`);
+        }
+        
+        element.textContent = translation;
+    });
+    
+    // Update elements with data-i18n-placeholder attributes
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        const translation = i18next.t(key);
+        
+        // Debug logging
+        if (translation === key) {
+            console.warn(`Q-Form placeholder translation missing for key: ${key}`);
+        }
+        
+        element.placeholder = translation;
+    });
+}
+
+// Update language selector visual state
+function updateLanguageSelector() {
+    document.querySelectorAll('.lang-flag').forEach(flag => {
+        const lang = flag.getAttribute('data-lang');
+        if (lang === i18next.language) {
+            flag.style.opacity = '1';
+            flag.style.transform = 'scale(1.1)';
+        } else {
+            flag.style.opacity = '0.7';
+            flag.style.transform = 'scale(1)';
+        }
+    });
+}
+
+// Switch language function
+function switchLanguage(lang) {
+    console.log('🌐 Q-Form Language changing to:', lang);
+    currentFormLanguage = lang;
+    saveFormLanguage(lang);
+    
+    i18next.changeLanguage(lang).then(() => {
+        updateFormInterface();
+        updateLanguageSelector();
+        // Reload speakers dropdown to update language
+        loadSpeakers();
+        console.log(`✅ Q-Form language changed to: ${lang}`);
+    }).catch(error => {
+        console.error('❌ Error changing Q-Form language:', error);
+    });
+}
+
+// Initialize on DOM load
+document.addEventListener('DOMContentLoaded', function() {
+    initFormTranslations();
+});
+
+// Add hover effects to language flags
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.lang-flag').forEach(flag => {
+        flag.addEventListener('mouseenter', function() {
+            if (this.getAttribute('data-lang') !== i18next.language) {
+                this.style.opacity = '1';
+            }
+        });
+        
+        flag.addEventListener('mouseleave', function() {
+            if (this.getAttribute('data-lang') !== i18next.language) {
+                this.style.opacity = '0.7';
+            }
+        });
+    });
+});
+</script>
+    
+</body>
+</html>

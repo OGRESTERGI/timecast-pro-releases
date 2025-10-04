@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <script src="libs/NoSleep.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta charset="UTF-8">
+    
+
+    <title>Presentation Timer</title>
+    <style>
+        html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        
+      body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #2c3e50;
+    color: white;
+    overflow: hidden;  /* ΑΛΛΑΓΗ: από auto σε hidden */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+/* ΠΡΟΣΘΗΚΗ: DPI scaling fixes */
+zoom: 1;
+transform: scale(1);
+width: 100vw;
+height: 100vh;
+margin: 0;
+padding: 0;
+}
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+       header {
+    background-color: rgba(0, 0, 0, 0.3);
+    text-align: center;
+    padding: 0.5vh 0;
+    font-weight: bold;
+    /* ΑΦΑΙΡΕΘΗΚΕ: font-size: 3vh; για να μπορεί να αλλάζει δυναμικά */
+}
+
+        .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 0;
+    margin-top: -5vh;
+    height: calc(100vh - 8vh);
+    transition: all 0.5s ease;
+    margin-bottom: 0; /* ΠΡΟΣΘΗΚΗ: Αφαίρεση κάτω margin */
+}
+
+/* ΠΡΟΣΘΗΚΗ: Classes για δυναμική αλλαγή */
+.main-content.with-message {
+    justify-content: flex-start;
+    padding-top: 3vh;
+}
+
+.main-content.no-message {
+    justify-content: center;
+    padding-top: 0;
+}
+
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #c0392b;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: none; /* Hidden by default, shown on disconnect */
+        }
+
+        .timer {
+            font-size: 25vh;
+            font-weight: bold;
+            text-align: center;
+            margin: 4vh 0;
+            transition: font-size 0.5s ease-in-out;
+        }
+
+        .timer.warning {
+            color: #f39c12;
+        }
+
+        .timer.danger {
+            color: #e74c3c;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* ΠΡΟΣΘΗΚΗ: Pulsating effect για overtime */
+        @keyframes pulsating {
+            0% { 
+                opacity: 0.6; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.05);
+            }
+            100% { 
+                opacity: 0.6; 
+                transform: scale(1);
+            }
+        }
+
+.timer.overtime {
+    color: #e74c3c;
+    animation: pulsating 1.5s ease-in-out infinite;
+    transform-origin: center center;
+}
+
+        .progress-container {
+            width: 80%;
+            max-width: 600px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin: 0 auto;
+            overflow: hidden;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-container.no-message {
+            width: 95%;
+            max-width: 1600px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: #3498db;
+            border-radius: 15px;
+            transition: width 1s linear;
+        }
+
+        .progress-bar.warning {
+            background-color: #f39c12;
+        }
+
+        .progress-bar.danger {
+            background-color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+        @keyframes pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+/* Πολύ διακριτικό Flash - μόνο αλλαγή χρώματος */
+@keyframes flash-alert {
+    0% { 
+        color: #ffffff;
+    }
+    50% { 
+        color: #ff6b6b;
+    }
+    100% { 
+        color: #ffffff;
+    }
+}
+
+.timer-preview.flash-alert,
+.timer.flash-alert,
+#message-preview.flash-alert,
+#message.flash-alert {
+    animation: flash-alert 1.2s ease-in-out infinite;
+}
+
+.timer.flash-alert {
+    animation: flash-alert 0.5s infinite;
+}
+
+#message.flash-alert {
+    animation: flash-alert 0.5s infinite;
+}
+
+/* Question elements flash animation */
+.question-from-line.flash-alert,
+.question-to-line.flash-alert,
+.question-subject-line.flash-alert,
+.question-text-content.flash-alert {
+    animation: flash-alert 0.5s infinite;
+}
+
+/* ΔΙΕΓΡΑΦΗ: Duplicate .timer.overtime rule - υπάρχει ήδη παραπάνω */
+
+
+#message.overtime {
+    animation: pulsating 2s infinite;
+}
+
+
+        .message-container {
+    width: 90%;
+    max-width: 90%;
+    margin: 0vh auto 1vh auto;
+    text-align: center;
+    max-width: 1920px;
+    max-height: 55vh; /* ΜΕΙΩΣΗ: από 40vh σε 35vh για mobile safety */
+    margin-top: 1px;
+    overflow: visible;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    padding-bottom: 0vh; /* ΠΡΟΣΘΗΚΗ: Ασφαλές κενό από κάτω */
+}
+
+#message {
+    background-color: transparent;
+    padding: 5px;
+    border-radius: 0;
+    font-size: 20vh;
+    font-weight: normal;
+    min-height: auto;
+    max-height: 60vh; /* ΑΥΞΗΣΗ: από 25vh σε 40vh */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: font-size 0.4s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    
+    text-align: center;
+    line-height: 1.2;
+    overflow: visible;
+    width: 100%;
+    white-space: normal; /* ΠΡΟΣΘΗΚΗ: επιτρέπει line breaks */
+    word-break: keep-all; /* ΑΛΛΑΓΗ: από break-word σε keep-all */
+overflow-wrap: anywhere; /* ΠΡΟΣΘΗΚΗ */
+hyphens: none; /* ΠΡΟΣΘΗΚΗ */
+}
+        #message:empty {
+            opacity: 0;
+        }
+        /* ========== SECONDARY TIMER STYLES (vMix) ========== */
+        .secondary-timer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.911);
+            border: 2px solid #e74c3c;
+            border-radius: 0;
+            padding: 5vh 5vw;
+            text-align: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: slideInRight 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        
+        .secondary-timer-title {
+            font-size: clamp(2rem, 6vh, 5rem);
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 4vh;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .secondary-timer-subtitle {
+            font-size: clamp(3rem, 8vh, 8rem);
+            font-weight: bold;
+            color: #ffc400;
+            margin-bottom: 4vh;
+            text-align: center;
+            line-height: 1;
+        }
+        
+        .secondary-timer-time {
+            font-size: clamp(4rem, 16vh, 25rem);
+            font-weight: bold;
+            color: #36acca;
+            margin-bottom: 4vh;
+            text-shadow: 0 0 3px rgb(255, 255, 255);
+            line-height: 1;
+            text-align: center;
+        }
+        
+        .secondary-timer-progress {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .secondary-progress-bar {
+            height: 100%;
+            background: #00cc44;
+            border-radius: 4px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 204, 68, 0.5);
+        }
+        
+        .secondary-progress-bar.warning {
+            background: #ff9500;
+            box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+        }
+        
+        .secondary-progress-bar.danger {
+            background: #ff3b30;
+            box-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
+        }
+        
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .secondary-timer.slide-out {
+            animation: slideOutRight 0.8s ease-in-out forwards;
+        }
+        
+        /* Enhanced responsive για mobile */
+        @media (max-width: 768px) {
+            .secondary-timer {
+                padding: 3vh 3vw;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .secondary-timer-title {
+                font-size: clamp(1.2rem, 4vh, 2rem);
+                margin-bottom: 2vh;
+            }
+            
+            .secondary-timer-subtitle {
+                font-size: clamp(1.5rem, 5vh, 3rem);
+                margin-bottom: 2vh;
+            }
+            
+            .secondary-timer-time {
+                font-size: clamp(2.5rem, 12vh, 4rem);
+                margin-bottom: 2vh;
+            }
+            
+            .secondary-timer-progress {
+                height: 8px;
+                width: 90vw;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .secondary-timer {
+                padding: 2vh 2vw;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .secondary-timer-title {
+                font-size: clamp(1rem, 3vh, 1.5rem);
+                margin-bottom: 1.5vh;
+            }
+            
+            .secondary-timer-subtitle {
+                font-size: clamp(1.2rem, 4vh, 2rem);
+                margin-bottom: 1.5vh;
+            }
+            
+            .secondary-timer-time {
+                font-size: clamp(2rem, 10vh, 3rem);
+                margin-bottom: 1.5vh;
+            }
+            
+            .secondary-timer-progress {
+                width: 95vw;
+            }
+        }
+
+        #message.automatic-message {
+    font-size: min(20vh, 6vw) !important;
+    line-height: 1.0 !important;
+    white-space: pre-line !important;
+    text-align: center !important;
+}
+
+        /* Logo containers */
+       .logo {
+    width: 8vh; /* Αντί για pixels, χρήση viewport height */
+    height: 8vh;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    display: none;
+}
+
+        .logo.tl {
+            top: 40px;
+            left: 10px;
+        }
+        
+        .logo.tc {
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logo.tr {
+            top: 40px;
+            right: 10px;
+        }
+
+        .logo.bl {
+            bottom: 10px;
+            left: 10px;
+        }
+        
+        .logo.bc {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logo.br {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            
+            header {
+                font-size: 2.5vh;
+                padding: 1.5vh 0;
+            }
+
+            .timer {
+                font-size: 20vh;
+                margin: 3vh 0;
+            }
+
+            .progress-container {
+                width: 90%;
+                height: 20px;
+            }
+
+            #message {
+                font-size: 6vh;
+                padding: 15px;
+            }
+
+            .logo {
+                width: 6vh;
+                height: 6vh;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                font-size: 2vh;
+                padding: 1vh 0;
+            }
+
+            .timer {
+                font-size: 15vh;
+                margin: 2vh 0;
+            }
+
+            .progress-container {
+                width: 95%;
+                height: 15px;
+            }
+
+            #message {
+                font-size: 5vh;
+                padding: 10px;
+            }
+
+            .logo {
+                width: 5vh;
+                height: 5vh;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 600px) {
+            header {
+                font-size: 4vh;
+                padding: 1vh 0;
+            }
+            
+            .timer {
+                font-size: 30vh;
+                margin: 2vh 0;
+            }
+            
+            .progress-container {
+                height: 4vh;
+            }
+            
+            #message {
+                font-size: 8vh;
+                padding: 2vh;
+            }
+            
+            .logo {
+                width: 10vh;
+                height: 10vh;
+            }
+        }
+        /* Styling για ερωτήσεις */
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .question-from-line,
+    .question-to-line {
+        font-size: 2vh !important;
+    }
+    
+    .question-subject-line {
+        font-size: 2.5vh !important;
+    }
+    
+    .question-text-content {
+        font-size: 3vh !important;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Right-click context menu -->
+    <div id="contextMenu" style="position: fixed; background: #2c3e50; border: 1px solid #34495e; border-radius: 4px; padding: 8px 0; display: none; z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+        <div id="setPcName" style="padding: 8px 16px; cursor: pointer; color: white; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#34495e'" onmouseout="this.style.background='transparent'">
+            💻 Set PC Name
+        </div>
+    </div>
+    
+    <!-- Custom input dialog -->
+    <div id="pcNameDialog" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: #2c3e50; padding: 20px; border-radius: 8px; color: white; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <h3 style="margin-top: 0; color: #ecf0f1;">💻 Όνομα Υπολογιστή</h3>
+            <input type="text" id="pcNameInput" style="width: 200px; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; font-size: 16px; text-align: center;" placeholder="π.x. ASUS">
+            <div style="margin-top: 15px;">
+                <button id="pcNameOk" style="background: #27ae60; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 14px;">OK</button>
+                <button id="pcNameCancel" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 14px;">Ακύρωση</button>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <header id="title-preview">
+    Presentation Timer
+</header>
+        
+        <div class="connection-status" id="connection-status">
+            Αποσυνδέθηκε
+        </div>
+        
+        <div class="main-content">
+            <!-- Logo positions -->
+            <div class="logo tl" id="logo-tl"></div>
+            <div class="logo tc" id="logo-tc"></div>
+            <div class="logo tr" id="logo-tr"></div>
+            
+            <div class="timer" id="timer">00:00</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="message-container">
+                <div id="message"></div>
+            </div>
+            
+            <!-- vMix Video Timer -->
+            <div class="secondary-timer" id="secondary-timer" style="display: none;">
+                <div class="secondary-timer-title" id="secondary-timer-title">Video Title</div>
+                <div class="secondary-timer-subtitle">Τέλος Βίντεο σε:</div>
+                <div class="secondary-timer-time" id="secondary-timer-time">00:00</div>
+                <div class="secondary-timer-progress" id="secondary-timer-progress">
+                    <div class="secondary-progress-bar" id="secondary-progress-bar"></div>
+                </div>
+            </div>
+            
+            <!-- Bottom logo positions -->
+            <div class="logo bl" id="logo-bl"></div>
+            <div class="logo bc" id="logo-bc"></div>
+            <div class="logo br" id="logo-br"></div>
+        </div>
+        
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        
+        // Global variables
+        let socket;
+        let timeLeft =900; // 15 minutes default
+        let originalTime = 900;
+        let warningThreshold = 60;
+        let isRunning = false;
+        let timerInterval;
+        let reconnectAttempts = 0;
+        let isConnecting = false;
+        let isMessageVisible = true;
+        let hasReceivedFullState = false;
+        let clockMode = false; // false = timer display, true = current time display
+        
+
+        const MAX_RECONNECT_ATTEMPTS = 5;
+        const RECONNECT_DELAY = 3000;
+
+        // Sound setup
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+        let soundVolume = 0.7;
+        
+
+        // Connect to Socket.IO server
+        function connectSocket() {
+            if (isConnecting) return; // Αποτροπή multiple connections
+            isConnecting = true;
+            
+            socket = io();
+            
+            socket.on('connect', () => {
+                document.getElementById('connection-status').style.display = 'none';
+                reconnectAttempts = 0;
+                isConnecting = false;
+                
+                // Παίρνουμε το saved PC name
+                const savedPcName = localStorage.getItem('pcName');
+                const hostname = savedPcName && savedPcName.trim() ? savedPcName.trim() : 'Timer-Display';
+                
+                console.log('🔍 Sending hostname to server:', hostname);
+                socket.emit('registerClient', {
+                    type: 'viewer',
+                    role: 'display',
+                    hostname: hostname
+                });
+
+                // Send current timer state along with requestFullState (for server restart sync)
+                socket.emit('requestFullState', {
+                    currentTimerState: {
+                        timeLeft: timeLeft,
+                        originalTime: originalTime,
+                        isRunning: isRunning
+                    }
+                });
+            });
+            
+            // PING/PONG HANDLERS για heartbeat
+            socket.on('ping', () => {
+                socket.emit('pong');
+            });
+
+            socket.on('pong', () => {
+                // Server received our ping
+            });
+            
+            // Questions display events
+    socket.on('displayQuestion', (data) => {
+        displayQuestionOnScreen(data.question);
+    });
+
+    socket.on('hideQuestion', (data) => {
+        hideQuestionFromScreen();
+    });
+
+            socket.on('disconnect', () => {
+                document.getElementById('connection-status').style.display = 'block';
+                isConnecting = false;
+                if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    setTimeout(() => {
+                        reconnectAttempts++;
+                        connectSocket();
+                    }, RECONNECT_DELAY);
+                }
+            });
+
+            // Listen for command events
+            socket.on('command', (data) => {
+                handleCommand(data);
+            });
+
+            // Listen for time adjustment
+            socket.on('adjustTime', (data) => {
+                timeLeft += data.seconds;
+                if (timeLeft < 0) timeLeft = 0;
+                updateTimerDisplay();
+                updateProgressBar();
+            });
+
+            // Listen for timer updates
+            socket.on('timerUpdate', (data) => {
+                timeLeft = data.timeLeft;
+                updateTimerDisplay();
+                updateProgressBar();
+                
+                // Apply warning/danger states
+                const timerElement = document.getElementById('timer');
+                // Αφαίρεση μόνο των state classes, διατήρηση των animation classes
+                timerElement.classList.remove('warning', 'danger');
+                if (!timerElement.classList.contains('timer')) {
+                    timerElement.classList.add('timer');
+                }
+                
+                if (data.status === 'warning') {
+                    timerElement.classList.add('warning');
+                } else if (data.status === 'danger' || timeLeft <= 0) {
+                    // Διατήρηση κόκκινου χρώματος όταν ο χρόνος έχει τελειώσει
+                    timerElement.classList.add('danger');
+                }
+                
+                // Διατήρηση overtime class για animation αν ο χρόνος είναι αρνητικός
+                if (timeLeft < 0) {
+                    timerElement.classList.add('overtime');
+                }
+            });
+
+            // Listen for message updates
+socket.on('messageUpdate', (data) => {
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        
+        // ΝΕΟΣ ΤΡΟΠΟΣ: Έλεγχος αν είναι ερώτηση και εφαρμογή σωστού formatting
+        if (data.message && data.message.includes('Ερώτηση από:') && data.message.includes('Θέμα:')) {
+            
+            // ΠΑΡΣΙΝΓΚ της ερώτησης από το plain text
+            const lines = data.message.split('\n').filter(line => line.trim());
+            
+            const fromLine = lines.find(line => line.includes('Ερώτηση από:')) || 'Ερώτηση από: -';
+            const toLine = lines.find(line => line.includes('Ερώτηση προς:')) || 'Ερώτηση προς: -';
+            const subjectLine = lines.find(line => line.includes('Θέμα:')) || 'Θέμα: -';
+            
+            const subjectIndex = lines.findIndex(line => line.includes('Θέμα:'));
+            const questionText = subjectIndex >= 0 && subjectIndex < lines.length - 1 
+                ? lines.slice(subjectIndex + 1).join(' ').trim() 
+                : 'Κείμενο ερώτησης';
+            
+            // Δημιουργία ΧΡΩΜΑΤΙΣΤΟΥ HTML για ερώτηση
+            const questionHTML = `
+                <div class="question-display">
+                    <div class="question-from-line" style="font-size: 2.5vh; color: #3498db; font-weight: bold; margin-bottom: 1vh; text-align: center;">
+                        ${fromLine}
+                    </div>
+                    <div class="question-to-line" style="font-size: 2.5vh; color: #2ecc71; font-weight: bold; margin-bottom: 1vh; text-align: center;">
+                        ${toLine}
+                    </div>
+                    <div class="question-subject-line" style="font-size: 3vh; color: #f39c12; font-weight: bold; margin-bottom: 2vh; text-align: center;">
+                        ${subjectLine}
+                    </div>
+                    <div class="question-text-content" style="font-size: 3.5vh; color: #ffffff; line-height: 1.4; text-align: center;">
+                        ${questionText}
+                    </div>
+                </div>
+            `;
+            
+            messageElement.innerHTML = questionHTML;
+            
+            // Ειδικό styling για ερωτήσεις
+            messageElement.style.textAlign = 'center';
+            messageElement.style.lineHeight = '1.5';
+            messageElement.style.display = 'flex';
+            messageElement.style.flexDirection = 'column';
+            messageElement.style.alignItems = 'center';
+            messageElement.style.justifyContent = 'center';
+            
+            // ΠΡΟΣΘΗΚΗ: Responsive font scaling για ερωτήσεις
+            adjustQuestionFontSize(messageElement, questionHTML);
+            
+            
+        } else {
+            // Κανονικό μήνυμα
+            messageElement.textContent = data.message;
+            adjustMessageFontSize(messageElement, data.message);
+            
+            // Επαναφορά styling για κανονικά μηνύματα
+            messageElement.style.textAlign = '';
+            messageElement.style.lineHeight = '';
+            messageElement.style.display = '';
+            messageElement.style.flexDirection = '';
+            messageElement.style.alignItems = '';
+            messageElement.style.justifyContent = '';
+            
+        }
+        
+        // ΠΡΟΣΘΗΚΗ: Ειδικό styling για αυτόματο μήνυμα δύο γραμμών
+        if (data.message === 'ΤΕΛΟΣ\nΧΡΟΝΟΥ') {
+            messageElement.classList.add('automatic-message');
+        } else {
+            messageElement.classList.remove('automatic-message');
+        }
+        
+        // ΠΡΟΣΘΗΚΗ: Προσαρμογή μεγέθους timer όταν έρχεται μήνυμα
+        const hasMessage = data.message && data.message.trim() !== '';
+        adjustTimerSize(hasMessage && isMessageVisible);
+    }
+});
+
+            // Listen for settings updates
+            socket.on('settingsUpdate', (data) => {
+                handleSettingsUpdate(data);
+            });
+
+            // Listen for full state update
+socket.on('fullStateUpdate', (state) => {
+    console.log('Received full state update:', state);
+
+    // 🔄 SMART SYNC: Only update timer if local timer is NOT running
+    // If local timer is running, it's the source of truth (server restart scenario)
+    if (!isRunning) {
+        timeLeft = state.timeLeft;
+        originalTime = state.originalTime;
+        isRunning = state.isRunning;
+        console.log('⏱️ Timer state updated from server');
+    } else {
+        console.log('⏭️ Local timer running - keeping local state');
+    }
+
+    warningThreshold = state.warningThreshold;
+
+    // Update display
+    updateTimerDisplay();
+    updateProgressBar();
+    
+    // Update title ΠΡΩΤΑ
+    if (state.title) {
+    const titleElement = document.getElementById('title-preview');
+        titleElement.textContent = state.title;
+        document.title = state.title;
+        
+        // ΠΡΟΣΘΗΚΗ: Εφαρμογή custom font size από το state
+        if (state.displaySettings && state.displaySettings.titleFontSize) {
+            titleElement.style.fontSize = state.displaySettings.titleFontSize + 'px';
+        }
+    }
+    
+    // Update message - ΒΕΛΤΙΩΣΗ: Έλεγχος για ερωτήσεις στο fullState
+if (state.message !== undefined) {
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        
+        // ΕΛΕΓΧΟΣ: Αν είναι ερώτηση, διατήρησε το χρωματιστό layout
+        if (state.message.includes('Ερώτηση από:') && state.message.includes('Θέμα:')) {
+            
+            // ΠΑΡΣΙΝΓΚ της ερώτησης από το plain text - ΙΔΙΟ ΜΕ admin
+            const lines = state.message.split('\n').filter(line => line.trim());
+            
+            // Εξαγωγή στοιχείων (με fallbacks για ασφάλεια)
+            const fromLine = lines.find(line => line.includes('Ερώτηση από:')) || 'Ερώτηση από: -';
+            const toLine = lines.find(line => line.includes('Ερώτηση προς:')) || 'Ερώτηση προς: -';
+            const subjectLine = lines.find(line => line.includes('Θέμα:')) || 'Θέμα: -';
+            
+            // Το κύριο κείμενο είναι όλα τα υπόλοιπα μετά τη γραμμή θέματος
+            const subjectIndex = lines.findIndex(line => line.includes('Θέμα:'));
+            const questionText = subjectIndex >= 0 && subjectIndex < lines.length - 1 
+                ? lines.slice(subjectIndex + 1).join(' ').trim() 
+                : 'Κείμενο ερώτησης';
+            
+            // Δημιουργία ΧΡΩΜΑΤΙΣΤΟΥ HTML - ΙΔΙΟ ΜΕ displayQuestionOnScreen
+            const questionHTML = `
+                <div class="question-from-line" style="font-size: 2.5vh; color: #3498db; font-weight: bold; margin-bottom: 1vh; text-align: center;">
+                    ${fromLine}
+                </div>
+                <div class="question-to-line" style="font-size: 2.5vh; color: #2ecc71; font-weight: bold; margin-bottom: 1vh; text-align: center;">
+                    ${toLine}
+                </div>
+                <div class="question-subject-line" style="font-size: 3vh; color: #f39c12; font-weight: bold; margin-bottom: 2vh; text-align: center;">
+                    ${subjectLine}
+                </div>
+                <div class="question-text-content" style="font-size: 3.5vh; color: #ffffff; line-height: 1.4; text-align: center;">
+                    ${questionText}
+                </div>
+            `;
+            
+            // Εμφάνιση με το χρωματιστό layout - ΙΔΙΟ ΜΕ displayQuestionOnScreen
+            messageElement.innerHTML = questionHTML;
+            
+            // Ειδικό styling για ερωτήσεις - ΙΔΙΟ ΜΕ displayQuestionOnScreen
+            messageElement.style.textAlign = 'center';
+            messageElement.style.lineHeight = '1.5';
+            messageElement.style.display = 'flex';
+            messageElement.style.flexDirection = 'column';
+            messageElement.style.alignItems = 'center';
+            
+            // Smart font scaling για ερωτήσεις
+            adjustQuestionFontSize(messageElement, questionHTML);
+            
+            
+        } else {
+            // Είναι κανονικό μήνυμα - ΠΑΛΙΑ ΛΟΓΙΚΗ
+            messageElement.textContent = state.message;
+            adjustMessageFontSize(messageElement, state.message);
+        }
+        
+        // Adjust timer size
+        adjustTimerSize(state.message.trim() !== '' && isMessageVisible);
+    }
+}
+// ΑΦΑΙΡΕΣΗ του else - δεν καθαρίζουμε μήνυμα αν δεν υπάρχει στο state
+    
+    // Update message visibility
+    if (state.messageVisible !== undefined) {
+        isMessageVisible = state.messageVisible;
+        const messageElement = document.getElementById('message');
+        if (messageElement) {
+            messageElement.style.display = isMessageVisible ? 'flex' : 'none';
+            
+            // ΠΡΟΣΘΗΚΗ: Προσαρμογή μεγέθους timer όταν αλλάζει η ορατότητα
+            const hasVisibleMessage = isMessageVisible && (messageElement.textContent.trim() !== '' || messageElement.innerHTML.trim() !== '');
+            adjustTimerSize(hasVisibleMessage);
+        }
+    }
+    
+    // Update display settings ΜΕΤΑ τον τίτλο
+    if (state.displaySettings) {
+        applyDisplaySettings(state.displaySettings);
+    }
+    
+    // Update sound settings
+    if (state.soundSettings) {
+        soundEnabled = state.soundSettings.enabled;
+        soundVolume = state.soundSettings.volume;
+    }
+    
+    // Start timer if running
+    if (isRunning && !timerInterval) {
+        startTimer();
+    }
+    
+    // Update vMix settings
+    if (state.vmixSettings) {
+        if (state.vmixSettings.host) vmixHost = state.vmixSettings.host;
+        if (state.vmixSettings.port) vmixPort = state.vmixSettings.port;
+        if (state.vmixSettings.enabled !== undefined) {
+            vmixEnabled = state.vmixSettings.enabled;
+            
+            // Αν απενεργοποιημένο, κρύψε αμέσως το secondary timer
+            if (!vmixEnabled) {
+                const secondaryTimer = document.getElementById('secondary-timer');
+                if (secondaryTimer) {
+                    secondaryTimer.style.display = 'none';
+                }
+            }
+        }
+    }
+    
+    // Update clock mode
+    if (state.clockMode !== undefined) {
+        clockMode = state.clockMode;
+        updateTimerDisplay();
+    }
+    
+    // ΠΡΟΣΘΗΚΗ: Τώρα έχουμε τα σωστά δεδομένα
+    hasReceivedFullState = true;
+    
+    // ΠΡΟΣΘΗΚΗ: Τώρα μπορούμε να κάνουμε το σωστό resize
+    const messageElement = document.getElementById('message');
+    const hasVisibleMessage = isMessageVisible && messageElement && messageElement.textContent.trim() !== '';
+    adjustTimerSize(hasVisibleMessage);
+    
+    // Update secondary timer από fullState
+    if (state.secondaryTimer) {
+        updateSecondaryTimer(state.secondaryTimer);
+    }
+
+});
+
+// Listen for auto-timer events
+socket.on('autoTimerTriggered', (data) => {
+    console.log('⏱️ Auto-timer triggered event received in timer:', data);
+    
+    // Could show a brief notification or visual indicator
+    // For example, flash the timer border briefly
+    const timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.style.boxShadow = '0 0 20px #e67e22';
+        setTimeout(() => {
+            timerElement.style.boxShadow = '';
+        }, 2000);
+    }
+});
+
+socket.on('autoTimerStarted', (data) => {
+    console.log('⏱️ Auto-timer started event received in timer:', data);
+    
+    // Optional: Could show a message briefly
+    // console.log(`Timer ξεκίνησε αυτόματα για ερώτηση (${data.minutes} λεπτά)`);
+});
+
+socket.on('autoTimerCanceled', (data) => {
+    console.log('🚫 Auto-timer canceled event received in timer:', data);
+    
+    // Optional: Visual feedback that auto-timer was canceled
+    const timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.style.boxShadow = '0 0 20px #95a5a6';
+        setTimeout(() => {
+            timerElement.style.boxShadow = '';
+        }, 1000);
+    }
+});
+
+            // Listen for secondary timer updates (vMix)
+            socket.on('secondaryTimerUpdate', (data) => {
+                console.log('📹 Secondary timer update received:', data);
+                updateSecondaryTimer(data);
+            });
+            
+            // Listen for vMix settings updates
+            socket.on('vmixSettingsUpdate', (data) => {
+                console.log('📹 vMix settings update received:', data);
+                if (data.host) vmixHost = data.host;
+                if (data.port) vmixPort = data.port;
+                
+                // Ενημέρωση της κατάστασης enabled
+                if (data.enabled !== undefined) {
+                    vmixEnabled = data.enabled;
+                    
+                    if (vmixEnabled === false) {
+                        const secondaryTimer = document.getElementById('secondary-timer');
+                        if (secondaryTimer) {
+                            secondaryTimer.style.display = 'none';
+                        }
+                        console.log('🔴 vMix secondary timer disabled');
+                    } else {
+                        console.log('🟢 vMix secondary timer enabled');
+                        // Το secondary timer θα εμφανιστεί αυτόματα όταν έρθουν δεδομένα
+                    }
+                }
+            });
+            
+            // Listen for message visibility updates
+socket.on('messageVisibilityUpdate', (data) => {
+    console.log('Message visibility update received:', data);
+    isMessageVisible = data.visible;
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        messageElement.style.display = isMessageVisible ? 'flex' : 'none';
+        
+        // ΠΡΟΣΘΗΚΗ: Προσαρμογή μεγέθους timer όταν αλλάζει η ορατότητα
+        const hasVisibleMessage = isMessageVisible && (messageElement.textContent.trim() !== '' || messageElement.innerHTML.trim() !== '');
+        adjustTimerSize(hasVisibleMessage);
+    }
+});
+
+            // Listen for clock mode updates
+            socket.on('clockModeUpdate', (data) => {
+                console.log('🕐 Clock mode update received:', data);
+                if (data.clockMode !== undefined) {
+                    clockMode = data.clockMode;
+                    updateTimerDisplay();
+                }
+            });
+            
+            // Listen for flash alert events
+            socket.on('flashAlert', (data) => {
+                console.log('⚡ Flash alert received:', data);
+                const timerElement = document.getElementById('timer');
+                const messageElement = document.getElementById('message');
+
+                if (data.active) {
+                    // Start flash animation για timer
+                    if (timerElement) timerElement.classList.add('flash-alert');
+
+                    // Start flash animation για message και question elements
+                    if (messageElement) {
+                        messageElement.classList.add('flash-alert');
+
+                        // ΠΡΟΣΘΗΚΗ: Flash για όλα τα question elements
+                        const questionFromLine = messageElement.querySelector('.question-from-line');
+                        const questionToLine = messageElement.querySelector('.question-to-line');
+                        const questionSubjectLine = messageElement.querySelector('.question-subject-line');
+                        const questionTextContent = messageElement.querySelector('.question-text-content');
+
+                        if (questionFromLine) questionFromLine.classList.add('flash-alert');
+                        if (questionToLine) questionToLine.classList.add('flash-alert');
+                        if (questionSubjectLine) questionSubjectLine.classList.add('flash-alert');
+                        if (questionTextContent) questionTextContent.classList.add('flash-alert');
+                    }
+
+                    // Αν έχει flashCount (manual flash), σταμάτα μετά από X αναβοσβήματα
+                    if (data.flashCount) {
+                        const flashDuration = data.flashCount * 1200; // 1.2s per flash cycle
+                        setTimeout(() => {
+                            if (timerElement) timerElement.classList.remove('flash-alert');
+                            if (messageElement) {
+                                messageElement.classList.remove('flash-alert');
+
+                                // ΠΡΟΣΘΗΚΗ: Σταμάτημα flash για όλα τα question elements
+                                const questionFromLine = messageElement.querySelector('.question-from-line');
+                                const questionToLine = messageElement.querySelector('.question-to-line');
+                                const questionSubjectLine = messageElement.querySelector('.question-subject-line');
+                                const questionTextContent = messageElement.querySelector('.question-text-content');
+
+                                if (questionFromLine) questionFromLine.classList.remove('flash-alert');
+                                if (questionToLine) questionToLine.classList.remove('flash-alert');
+                                if (questionSubjectLine) questionSubjectLine.classList.remove('flash-alert');
+                                if (questionTextContent) questionTextContent.classList.remove('flash-alert');
+                            }
+                            console.log(`⚡ Flash stopped after ${data.flashCount} cycles`);
+                        }, flashDuration);
+                    }
+                } else {
+                    // Stop flash animation
+                    if (timerElement) timerElement.classList.remove('flash-alert');
+                    if (messageElement) {
+                        messageElement.classList.remove('flash-alert');
+
+                        // ΠΡΟΣΘΗΚΗ: Σταμάτημα flash για όλα τα question elements
+                        const questionFromLine = messageElement.querySelector('.question-from-line');
+                        const questionToLine = messageElement.querySelector('.question-to-line');
+                        const questionSubjectLine = messageElement.querySelector('.question-subject-line');
+                        const questionTextContent = messageElement.querySelector('.question-text-content');
+
+                        if (questionFromLine) questionFromLine.classList.remove('flash-alert');
+                        if (questionToLine) questionToLine.classList.remove('flash-alert');
+                        if (questionSubjectLine) questionSubjectLine.classList.remove('flash-alert');
+                        if (questionTextContent) questionTextContent.classList.remove('flash-alert');
+                    }
+
+                    // Αν ο χρόνος έχει τελειώσει (0 ή αρνητικός), διατήρησε τον κόκκινο χρώμα
+                    if (timeLeft <= 0) {
+                        if (timerElement) timerElement.classList.add('danger');
+
+                        // Κόκκινο και το progress bar
+                        const progressBar = document.querySelector('.progress-bar');
+                        if (progressBar) progressBar.classList.add('danger');
+                    }
+                }
+            });
+
+        }
+
+        // Handle incoming commands
+        function handleCommand(data) {
+           
+            
+            switch (data.type) {
+                case 'timer':
+                    switch (data.action) {
+                        case 'start':
+                            startTimer();
+                            break;
+                        case 'pause':
+                            pauseTimer();
+                            break;
+                        case 'reset':
+                            resetTimer();
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+    // ΣΙΓΟΥΡΑ καθαρισμός παλιού interval πριν ξεκινήσει νέο
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+    
+    isRunning = true;
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+        function pauseTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        isRunning = false;
+    }
+}
+
+        function resetTimer() {
+    // ΣΙΓΟΥΡΑ καθαρισμός interval
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    isRunning = false;
+    timeLeft = originalTime;
+    updateTimerDisplay();
+    updateProgressBar();
+    
+    const timerElement = document.getElementById('timer');
+    timerElement.className = 'timer';
+}
+
+        function updateTimer() {
+    timeLeft--;
+    updateTimerDisplay();
+    updateProgressBar();
+    
+    // Έλεγχος για ήχους (μόνο στο 0, όχι στον αρνητικό χρόνο)
+    if (timeLeft === warningThreshold) {
+        if (soundEnabled) playWarningSound();
+    } else if (timeLeft === 0) {
+        if (soundEnabled) playEndSound();
+        // ΔΕΝ σταματάμε το timer - συνεχίζει στον αρνητικό χρόνο
+    }
+}
+
+        function updateTimerDisplay() {
+    const timerElement = document.getElementById('timer');
+    
+    // Check if clock mode is enabled
+    if (clockMode) {
+        // Display current time instead of countdown
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        
+        timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timerElement.className = 'timer'; // Normal styling for clock mode
+        
+        // Update every second when in clock mode
+        if (!timerInterval) {
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+        
+        // ΠΡΟΣΘΗΚΗ: Άμεση προσαρμογή μεγέθους
+        const messagePreview = document.getElementById('message');
+        const hasMessage = messagePreview && messagePreview.textContent.trim() !== '';
+        adjustTimerSize(hasMessage && isMessageVisible);
+        return;
+    }
+    
+    if (timeLeft < 0) {
+        // Αρνητικός χρόνος - OVERTIME με pulsating
+        const overtimeSeconds = Math.abs(timeLeft);
+        const hours = Math.floor(overtimeSeconds / 3600);
+        const minutes = Math.floor((overtimeSeconds % 3600) / 60);
+        const seconds = overtimeSeconds % 60;
+        
+        if (hours > 0) {
+            timerElement.textContent = `+${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        } else {
+            timerElement.textContent = `+${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        // Διατήρηση των υπαρχουσών κλάσεων και προσθήκη overtime
+        if (!timerElement.classList.contains('timer')) {
+            timerElement.classList.add('timer');
+        }
+        if (!timerElement.classList.contains('overtime')) {
+            timerElement.classList.add('overtime');
+        }
+        return;
+    }
+    
+    // Θετικός χρόνος ή μηδέν - απλά δείχνουμε τον χρόνο (ΧΩΡΙΣ "ΤΕΛΟΣ ΧΡΟΝΟΥ")
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = Math.max(0, timeLeft % 60);
+    
+    if (hours > 0) {
+        timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    } else {
+        timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    // Apply warning/danger classes - διατήρηση animation classes
+    timerElement.classList.remove('warning', 'danger', 'overtime');
+    if (!timerElement.classList.contains('timer')) {
+        timerElement.classList.add('timer');
+    }
+    
+    if (timeLeft <= warningThreshold && timeLeft > 0) {
+        timerElement.classList.add('warning');
+    } else if (timeLeft <= 0) {
+        // Διατήρηση κόκκινου χρώματος όταν ο χρόνος έχει τελειώσει ή είναι αρνητικός
+        timerElement.classList.add('danger');
+    }
+    // ΠΡΟΣΘΗΚΗ: Άμεση προσαρμογή μεγέθους για overtime display
+    const messagePreview = document.getElementById('message');
+    const hasMessage = messagePreview && messagePreview.textContent.trim() !== '';
+    adjustTimerSize(hasMessage && isMessageVisible);
+}
+
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progress-bar');
+            const percentage = (timeLeft / originalTime) * 100;
+            progressBar.style.width = percentage + '%';
+            
+            // Apply warning/danger classes
+            progressBar.className = 'progress-bar';
+            
+            if (timeLeft <= warningThreshold && timeLeft > 0) {
+                progressBar.classList.add('warning');
+            } else if (timeLeft === 0) {
+                progressBar.classList.add('danger');
+            }
+        }
+
+        function getTimerStatus() {
+            if (timeLeft === 0) return 'danger';
+            if (timeLeft <= warningThreshold) return 'warning';
+            return 'normal';
+        }
+
+        // Handle settings updates
+        // Handle settings updates
+function handleSettingsUpdate(data) {
+    console.log('⚙️ Settings update received in timer:', data);
+    
+    if (data.timer) {
+        if (data.timer.timeLeft !== undefined) timeLeft = data.timer.timeLeft;
+        if (data.timer.originalTime !== undefined) originalTime = data.timer.originalTime;
+        if (data.timer.warningThreshold !== undefined) warningThreshold = data.timer.warningThreshold;
+        
+        updateTimerDisplay();
+        updateProgressBar();
+    }
+    
+    if (data.display) {
+        console.log('🖼️ Display settings received:', data.display);
+        applyDisplaySettings(data.display);
+    }
+    
+    if (data.sound) {
+        if (data.sound.enabled !== undefined) soundEnabled = data.sound.enabled;
+        if (data.sound.volume !== undefined) soundVolume = data.sound.volume;
+    }
+}
+
+        
+function applyDisplaySettings(settings) {
+    console.log('🎨 Applying display settings - ΔΙΟΡΘΩΜΕΝΗ ΕΚΔΟΣΗ:', settings);
+    
+    // ΔΙΟΡΘΩΣΗ: Πάντα ενημερώνουμε τον τίτλο αν υπάρχει στα settings
+    if (settings.title) {
+        const titleElement = document.getElementById('title-preview');
+        titleElement.textContent = settings.title;
+        document.title = settings.title;
+        console.log('📝 Title updated in applyDisplaySettings:', settings.title);
+    }
+    
+    // Εφαρμογή titleFontSize με BOOST για timer
+    if (settings.titleFontSize) {
+        const titleElement = document.getElementById('title-preview');
+        if (titleElement) {
+            // BOOST: x1.5 μεγαλύτερο στον timer από το admin preview
+            const boostedSize = settings.titleFontSize * 1.5;
+            titleElement.style.fontSize = boostedSize + 'px';
+            console.log('🚀 TitleFontSize BOOSTED in timer:', settings.titleFontSize + 'px → ' + boostedSize + 'px');
+        }
+    }
+    
+    // Update background color
+    if (settings.backgroundColor) {
+        document.body.style.backgroundColor = settings.backgroundColor;
+        document.querySelector('.container').style.backgroundColor = settings.backgroundColor;
+    }
+    
+    // Update timer font family
+    if (settings.timerFontFamily) {
+        const timerElement = document.querySelector('.timer');
+        if (timerElement) {
+            timerElement.style.fontFamily = settings.timerFontFamily;
+            console.log('🎨 Timer font family updated:', settings.timerFontFamily);
+        }
+    }
+    
+    // Update logo
+    const positions = ['tl', 'tc', 'tr', 'bl', 'bc', 'br'];
+    
+    positions.forEach(position => {
+        const logoElement = document.getElementById(`logo-${position}`);
+        if (logoElement) {
+            if (!settings.logoDataUrl || settings.logoDataUrl.trim() === '') {
+                logoElement.style.backgroundImage = '';
+                logoElement.style.display = 'none';
+            } else if (settings.logoPositions && settings.logoPositions[position]) {
+                logoElement.style.backgroundImage = `url('${settings.logoDataUrl}')`;
+                logoElement.style.display = 'block';
+                
+                if (settings.logoSize) {
+                    const vhSize = (settings.logoSize / 10);
+                    logoElement.style.width = vhSize + 'vh';
+                    logoElement.style.height = vhSize + 'vh';
+                }
+            } else {
+                logoElement.style.backgroundImage = '';
+                logoElement.style.display = 'none';
+            }
+        }
+    });
+}
+        // Sound functions
+        function playWarningSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            gainNode.gain.value = soundVolume;
+            oscillator.frequency.value = 440;
+            oscillator.type = 'sine';
+            
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function playEndSound() {
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const oscillator3 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            oscillator3.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            gainNode.gain.value = soundVolume;
+            
+            oscillator1.frequency.value = 440;
+            oscillator2.frequency.value = 440;
+            oscillator3.frequency.value = 880;
+            
+            oscillator1.type = 'sine';
+            oscillator2.type = 'sine';
+            oscillator3.type = 'sine';
+            
+            oscillator1.start();
+            oscillator1.stop(audioContext.currentTime + 0.3);
+            
+            oscillator2.start(audioContext.currentTime + 0.3);
+            oscillator2.stop(audioContext.currentTime + 0.6);
+            
+            oscillator3.start(audioContext.currentTime + 0.6);
+            oscillator3.stop(audioContext.currentTime + 1.2);
+        }
+
+      function adjustMessageFontSize(element, text) {
+    if (!element) return;
+    
+    if (!text || text.trim() === '') {
+        element.style.fontSize = '';
+        element.style.lineHeight = '';
+        element.style.maxHeight = '';
+        element.style.overflow = '';
+        return;
+    }
+    
+    // Portrait detection για 30% μείωση
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const portraitMultiplier = isPortrait ? 0.9 : 1.0;
+    
+    // Ανάλυση κειμένου
+    const words = text.trim().split(/\s+/);
+    const wordCount = words.length;
+    
+    // Διαθέσιμος χώρος οθόνης
+    const screenHeight = window.innerHeight;
+    const screenWidth = window.innerWidth;
+    const availableHeight = screenHeight * 0.61; // 60% για μηνύματα
+    const availableWidth = screenWidth * 0.92;   // 90% πλάτος
+    
+    // ΕΞΥΠΝΟΣ ΑΛΓΟΡΙΘΜΟΣ: Δοκιμάζω μεγέθη από μεγάλα προς μικρά
+    let bestFontSize = 2; // Fallback ελάχιστο
+    
+    // Λίστα μεγεθών για δοκιμή (από μεγάλα προς μικρά)
+    const testSizes = [25, 20, 16, 14, 12, 10, 8, 6, 5, 4, 3, 2];
+    
+    for (let testSize of testSizes) {
+        // Υπολογισμός πόσο χώρο θα καταλάμβανε με αυτό το μέγεθος
+        const lineHeight = testSize * 1.1; // vh units
+        const estimatedCharWidth = testSize * 0.6; // Εκτίμηση πλάτους χαρακτήρα
+        
+        // Πόσοι χαρακτήρες χωράνε σε μία γραμμή;
+        const charsPerLine = Math.floor(availableWidth / (estimatedCharWidth * screenHeight / 100));
+        
+        // Πόσες γραμμές χρειάζομαι;
+        let neededLines = 1;
+        let currentLineLength = 0;
+        
+        for (let word of words) {
+            const wordLength = word.length + 1; // +1 για το κενό
+            
+            if (currentLineLength + wordLength > charsPerLine) {
+                // Δεν χωράει στη γραμμή, πάω στην επόμενη
+                neededLines++;
+                currentLineLength = wordLength;
+            } else {
+                currentLineLength += wordLength;
+            }
+        }
+        
+        // Υπολογισμός συνολικού ύψους που θα καταλάμβανε
+        const totalHeight = neededLines * lineHeight; // vh units
+        
+        // Αν χωράει στον διαθέσιμο χώρο, αυτό είναι το μέγεθός μας!
+        if (totalHeight <= (availableHeight / screenHeight * 100)) {
+            bestFontSize = testSize;
+            console.log(`✅ Font ${testSize}vh χωράει σε ${neededLines} γραμμές (ύψος: ${totalHeight.toFixed(1)}vh)`);
+            break;
+        } else {
+            console.log(`❌ Font ${testSize}vh χρειάζεται ${neededLines} γραμμές (ύψος: ${totalHeight.toFixed(1)}vh) - δεν χωράει`);
+        }
+    }
+    
+    // Εφαρμογή portrait multiplier
+    const finalSize = bestFontSize * portraitMultiplier;
+    
+    // Εφαρμογή στο element
+    element.style.setProperty('font-size', finalSize + 'vh', 'important');
+    element.style.setProperty('line-height', '1.1', 'important');
+    element.style.setProperty('white-space', 'normal', 'important');
+    element.style.setProperty('word-wrap', 'break-word', 'important');
+    element.style.setProperty('overflow-wrap', 'break-word', 'important');
+    element.style.setProperty('text-align', 'center', 'important');
+    
+    // ΑΦΑΙΡΕΣΗ περιορισμών που κόβουν το κείμενο
+    element.style.setProperty('max-height', 'none', 'important');
+    element.style.setProperty('overflow', 'visible', 'important');
+    
+    console.log(`🎯 FINAL: "${text}" | ${wordCount} λέξεις | ${finalSize.toFixed(1)}vh | Portrait: ${isPortrait ? '✓' : '✗'}`);
+}
+
+        
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            connectSocket();
+            updateTimerDisplay();
+            updateProgressBar();
+            
+            // Fullscreen on double click
+            const container = document.querySelector('.container');
+            
+            container.addEventListener('dblclick', () => {
+                if (!document.fullscreenElement) {
+                    container.requestFullscreen().catch(err => {
+                        console.error('Error entering fullscreen:', err);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+        });
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !socket.connected && !isConnecting) {
+                // Κλείσιμο παλιάς σύνδεσης αν υπάρχει
+                if (socket) {
+                    socket.disconnect();
+                    socket.removeAllListeners();
+                }
+                connectSocket();
+            }
+        });
+      function adjustTimerSize(hasMessage) {
+        if (!hasReceivedFullState) {
+        return;
+    }
+        
+    const timerElement = document.getElementById('timer');
+    const progressContainer = document.querySelector('.progress-container');
+    const mainContent = document.querySelector('.main-content');
+    if (!timerElement || !mainContent) return;
+    
+    
+    
+    if (hasMessage && isMessageVisible) {
+       
+        timerElement.style.fontSize = '10vh';
+        timerElement.style.margin = '1vh 0';
+        timerElement.style.transform = 'none';
+        timerElement.style.width = 'auto';
+        timerElement.style.position = 'static';
+        timerElement.style.left = 'auto';
+        timerElement.style.textAlign = 'center';
+        if (progressContainer) {
+            progressContainer.style.marginTop = '0';
+            progressContainer.classList.remove('no-message');
+        }
+        
+        mainContent.style.justifyContent = 'flex-start';
+        mainContent.style.paddingTop = '3vh';
+        mainContent.style.transform = 'none';
+    } else {    
+    const screenWidth = window.innerWidth;
+    const targetWidth = screenWidth * 0.9;
+    
+    // ΔΙΟΡΘΩΣΗ: Χρήση του ΠΡΑΓΜΑΤΙΚΟΥ μεγέθους (με το + αν υπάρχει)
+    const actualTimeString = timerElement.textContent || "00:00";
+    const charCount = actualTimeString.length; // Χρήση actual length
+    
+    const estimatedFontSize = (targetWidth / charCount) / 0.6;
+    const fontSizeVW = (estimatedFontSize / screenWidth) * 100;
+    const finalFontSize = Math.max(12, Math.min(fontSizeVW, 35));
+        
+        // ΤΕΛΕΙΟ CENTERING για όλες τις συσκευές
+        timerElement.style.boxSizing = 'border-box';
+        timerElement.style.fontSize = finalFontSize + 'vw';
+        timerElement.style.width = '120vw';
+        
+        timerElement.style.margin = '15vh 0 -40vh 0';
+        
+        timerElement.style.padding = '0';
+        timerElement.style.textAlign = 'center';
+        timerElement.style.position = 'relative';
+        timerElement.style.transform = 'translateX(0%)';
+        timerElement.style.display = 'block';
+        
+        if (progressContainer) {
+            progressContainer.style.marginTop = '40vh';
+            progressContainer.classList.add('no-message');
+        }
+        
+        mainContent.style.justifyContent = 'center';
+        mainContent.style.paddingTop = '0';
+        
+    }
+    
+    // Διατήρηση warning/danger/overtime classes
+    if (timeLeft < 0) {
+        timerElement.classList.add('overtime');
+    } else if (timeLeft === 0) {
+        timerElement.classList.add('danger');
+    } else if (timeLeft <= warningThreshold && timeLeft > 0) {
+        timerElement.classList.add('warning');
+    }
+}
+
+
+// NoSleep για να μην σβήνει η οθόνη
+const noSleep = new NoSleep();
+let noSleepEnabled = false;
+
+// Ενεργοποίηση NoSleep με οποιοδήποτε user interaction
+function enableNoSleep() {
+    if (!noSleepEnabled) {
+        try {
+            noSleep.enable();
+            noSleepEnabled = true;
+            console.log('NoSleep ενεργοποιήθηκε');
+            
+            // Αφαίρεση όλων των listeners
+            document.removeEventListener('click', enableNoSleep, false);
+            document.removeEventListener('touchstart', enableNoSleep, false);
+            document.removeEventListener('keydown', enableNoSleep, false);
+            
+            // Εμφάνιση μηνύματος στην οθόνη
+            showNoSleepStatus();
+        } catch (error) {
+            console.error('NoSleep failed:', error);
+        }
+    }
+}
+
+// Προσθήκη listeners για διαφορετικά events
+document.addEventListener('click', enableNoSleep, false);
+document.addEventListener('touchstart', enableNoSleep, false);
+document.addEventListener('keydown', enableNoSleep, false);
+
+// Right-click context menu events
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    const contextMenu = document.getElementById('contextMenu');
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = e.pageX + 'px';
+    contextMenu.style.top = e.pageY + 'px';
+});
+
+// Hide context menu on click elsewhere
+document.addEventListener('click', function(e) {
+    const contextMenu = document.getElementById('contextMenu');
+    if (!contextMenu.contains(e.target)) {
+        contextMenu.style.display = 'none';
+    }
+});
+
+// Set PC Name handler
+document.getElementById('setPcName').addEventListener('click', function() {
+    const currentName = localStorage.getItem('pcName') || '';
+    const dialog = document.getElementById('pcNameDialog');
+    const input = document.getElementById('pcNameInput');
+    
+    input.value = currentName;
+    dialog.style.display = 'flex';
+    input.focus();
+    input.select();
+    
+    document.getElementById('contextMenu').style.display = 'none';
+});
+
+// PC Name dialog handlers
+document.getElementById('pcNameOk').addEventListener('click', function() {
+    const input = document.getElementById('pcNameInput');
+    const newName = input.value.trim();
+    
+    if (newName) {
+        localStorage.setItem('pcName', newName);
+        console.log('✅ PC Name saved:', newName);
+        
+        // Επανασύνδεση με νέο hostname
+        if (socket && socket.connected) {
+            socket.emit('updateHostname', { hostname: newName });
+        }
+    }
+    
+    document.getElementById('pcNameDialog').style.display = 'none';
+});
+
+document.getElementById('pcNameCancel').addEventListener('click', function() {
+    document.getElementById('pcNameDialog').style.display = 'none';
+});
+
+// Enter key support
+document.getElementById('pcNameInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('pcNameOk').click();
+    } else if (e.key === 'Escape') {
+        document.getElementById('pcNameCancel').click();
+    }
+});
+
+// Ειδική ενεργοποίηση για iOS
+if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    console.log('iOS device detected - NoSleep will activate on first touch');
+    
+    // Πρόσθετη προστασία για iOS
+    document.addEventListener('touchend', enableNoSleep, false);
+    document.addEventListener('gesturestart', enableNoSleep, false);
+}
+
+// Εμφάνιση κατάστασης NoSleep
+function showNoSleepStatus() {
+    const statusDiv = document.createElement('div');
+    statusDiv.style.cssText = `
+        position: fixed;
+        top: 5px;
+        right: 5px;
+        background: rgba(39, 174, 96, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-size: 12px;
+        z-index: 9999;
+        pointer-events: none;
+    `;
+    statusDiv.textContent = '🔋 Screen Lock Disabled';
+    document.body.appendChild(statusDiv);
+    
+    // Αφαίρεση μετά από 3 δευτερόλεπτα
+    setTimeout(() => {
+        if (statusDiv.parentNode) {
+            statusDiv.parentNode.removeChild(statusDiv);
+        }
+    }, 3000);
+}
+
+// Έλεγχος κατάστασης NoSleep κάθε 30 δευτερόλεπτα
+// Απλή λύση: Επανενεργοποίηση NoSleep κάθε 1 λεπτό
+setInterval(() => {
+    if (noSleepEnabled && noSleep) {
+        try {
+            // Επανενεργοποίηση ανεξάρτητα από την κατάσταση
+            noSleep.enable();
+            console.log('NoSleep reactivated - 1 minute check');
+        } catch (error) {
+            console.error('NoSleep reactivation failed:', error);
+        }
+    }
+}, 60000); // Κάθε 1 λεπτό
+
+function displayQuestionOnScreen(question) {
+    console.log('🎯 Displaying question as message:', question);
+    
+    // Δημιουργία HTML-formatted κειμένου ερώτησης ΧΩΡΙΣ container - πλήρης οθόνη
+    const questionHTML = `
+        <div class="question-from-line" style="font-size: 2.5vh; color: #3498db; font-weight: bold; margin-bottom: 1vh; text-align: center;">
+            Ερώτηση από: ${question.submitter.name} (${question.submitter.company})
+        </div>
+        <div class="question-to-line" style="font-size: 2.5vh; color: #2ecc71; font-weight: bold; margin-bottom: 1vh; text-align: center;">
+            Ερώτηση προς: ${question.question.targetSpeaker}
+        </div>
+        <div class="question-subject-line" style="font-size: 3vh; color: #f39c12; font-weight: bold; margin-bottom: 2vh; text-align: center;">
+            Θέμα: ${question.question.subject}
+        </div>
+        <div class="question-text-content" style="font-size: 3.5vh; color: #ffffff; line-height: 1.4; text-align: center;">
+            ${question.question.text}
+        </div>
+    `;
+
+    // Στέλνουμε την ερώτηση σαν μήνυμα στον timer
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        messageElement.innerHTML = questionHTML;
+        
+        // Ειδικό styling για ερωτήσεις - ΠΛΗΡΗΣ ΟΘΟΝΗ
+        messageElement.style.textAlign = 'center';
+        messageElement.style.lineHeight = '1.5';
+        messageElement.style.display = 'flex';
+        messageElement.style.flexDirection = 'column';
+        messageElement.style.alignItems = 'center';
+        messageElement.style.justifyContent = 'center';
+        messageElement.style.width = '100%';
+        messageElement.style.height = '100%';
+        messageElement.style.padding = '0';
+        messageElement.style.margin = '0';
+
+        // ΠΡΟΣΘΗΚΗ: Responsive font scaling για ερωτήσεις
+        adjustQuestionFontSize(messageElement, questionHTML);
+
+        // ← ΠΡΟΣΘΗΚΗ: Ενεργοποίηση μίκρανσης timer
+        const hasMessage = questionHTML && questionHTML.trim() !== '';
+        adjustTimerSize(hasMessage && isMessageVisible);
+        
+        console.log('✅ Question displayed FULLSCREEN without container');
+    }
+}
+// Hide question from screen (καθαρισμός μηνύματος)
+function hideQuestionFromScreen() {
+    const messageElement = document.getElementById('message');
+    if (messageElement) {
+        messageElement.textContent = '';
+        messageElement.style.textAlign = '';
+        messageElement.style.lineHeight = '';
+        
+        // ← ΠΡΟΣΘΗΚΗ: Επαναφορά μεγέθους timer
+        adjustTimerSize(false);
+        
+        console.log('✅ Question hidden with timer restored');
+    }
+}
+
+function adjustQuestionFontSize(messageElement, questionHTML) {
+    console.log('🔧 adjustQuestionFontSize called with WORKING algorithm!');
+    
+    // ΧΡΗΣΗ ΤΗΣ ΙΔΙΑΣ ΜΕΘΟΔΟΥ ΜΕ ΤΑ MESSAGES - WORKING!
+    // Υπολογισμός συνολικού κειμένου ερώτησης
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = questionHTML;
+    const text = tempDiv.textContent || tempDiv.innerText || '';
+    
+    if (!text || text.trim() === '') {
+        return;
+    }
+    
+    console.log(`📝 Question text: "${text}" (${text.length} chars)`);
+    
+    // Portrait detection για 10% μείωση (λιγότερη από messages)
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const portraitMultiplier = isPortrait ? 0.9 : 1.0;
+    
+    // Ανάλυση κειμένου
+    const words = text.trim().split(/\s+/);
+    const wordCount = words.length;
+    
+    // Διαθέσιμος χώρος οθόνης - ΠΕΡΙΣΣΟΤΕΡΟΣ για ερωτήσεις
+    const screenHeight = window.innerHeight;
+    const screenWidth = window.innerWidth;
+    const availableHeight = screenHeight * 0.75; // ΑΥΞΗΣΗ: 75% για ερωτήσεις (από 61%)
+    const availableWidth = screenWidth * 0.95;   // ΑΥΞΗΣΗ: 95% πλάτος (από 92%)
+    
+    // ΕΞΥΠΝΟΣ ΑΛΓΟΡΙΘΜΟΣ: Δοκιμάζω μεγέθη από μεγάλα προς μικρά - ΙΔΙΟ ΜΕ MESSAGES
+    let bestFontSize = 2; // Fallback ελάχιστο
+    
+    // Λίστα μεγεθών για δοκιμή - ΙΔΙΑ ΜΕ MESSAGES
+    const testSizes = [25, 20, 16, 14, 12, 10, 8, 6, 5, 4, 3, 2];
+    
+    for (let testSize of testSizes) {
+        // Υπολογισμός πόσο χώρο θα καταλάμβανε - ΙΔΙΟΣ ΜΕ MESSAGES
+        const lineHeight = testSize * 1.1; // vh units
+        const estimatedCharWidth = testSize * 0.6; // Εκτίμηση πλάτους χαρακτήρα
+        
+        // Πόσοι χαρακτήρες χωράνε σε μία γραμμή;
+        const charsPerLine = Math.floor(availableWidth / (estimatedCharWidth * screenHeight / 100));
+        
+        // Πόσες γραμμές χρειάζομαι;
+        let neededLines = 1;
+        let currentLineLength = 0;
+        
+        for (let word of words) {
+            const wordLength = word.length + 1; // +1 για το κενό
+            
+            if (currentLineLength + wordLength > charsPerLine) {
+                // Δεν χωράει στη γραμμή, πάω στην επόμενη
+                neededLines++;
+                currentLineLength = wordLength;
+            } else {
+                currentLineLength += wordLength;
+            }
+        }
+        
+        // Υπολογισμός συνολικού ύψους που θα καταλάμβανε
+        const totalHeight = neededLines * lineHeight; // vh units
+        
+        // Αν χωράει στον διαθέσιμο χώρο, αυτό είναι το μέγεθός μας! (με safety margin)
+        const safetyMargin = 1.1; // 10% επιπλέον χώρος για ασφάλεια
+        if (totalHeight * safetyMargin <= (availableHeight / screenHeight * 100)) {
+            bestFontSize = testSize;
+            console.log(`✅ Font ${testSize}vh χωράει σε ${neededLines} γραμμές (ύψος: ${totalHeight.toFixed(1)}vh + safety, διαθέσιμο: ${(availableHeight/screenHeight*100).toFixed(1)}vh)`);
+            break;
+        } else {
+            console.log(`❌ Font ${testSize}vh χρειάζεται ${neededLines} γραμμές (ύψος: ${totalHeight.toFixed(1)}vh + safety) - δεν χωράει`);
+        }
+    }
+    
+    // Εφαρμογή portrait multiplier
+    const finalSize = bestFontSize * portraitMultiplier;
+    
+    // ΕΦΑΡΜΟΓΗ ΣΤΙΣ ΕΡΩΤΗΣΕΙΣ - αναλογικά μεγέθη
+    const fromSize = finalSize * 0.7;     // Μικρότερο για "Από"
+    const toSize = finalSize * 0.7;       // Μικρότερο για "Προς"
+    const subjectSize = finalSize * 0.85;  // Μεσαίο για "Θέμα"
+    const textSize = finalSize;            // Μεγαλύτερο για κύριο κείμενο
+    
+    // ΕΠΙΠΛΕΟΝ: Εξασφάλιση ότι το message container δεν κόβει
+    messageElement.style.setProperty('max-height', 'none', 'important');
+    messageElement.style.setProperty('overflow', 'visible', 'important');
+    messageElement.style.setProperty('height', 'auto', 'important');
+    
+    // Εφαρμογή των νέων μεγεθών με !important - ΙΔΙΟ ΜΕ MESSAGES
+    const fromLine = messageElement.querySelector('.question-from-line');
+    const toLine = messageElement.querySelector('.question-to-line');
+    const subjectLine = messageElement.querySelector('.question-subject-line');
+    const textContent = messageElement.querySelector('.question-text-content');
+    
+    if (fromLine) {
+        fromLine.style.setProperty('font-size', fromSize + 'vh', 'important');
+        fromLine.style.setProperty('line-height', '1.1', 'important');
+        fromLine.style.setProperty('max-height', 'none', 'important');
+        fromLine.style.setProperty('overflow', 'visible', 'important');
+    }
+    if (toLine) {
+        toLine.style.setProperty('font-size', toSize + 'vh', 'important');
+        toLine.style.setProperty('line-height', '1.1', 'important');
+        toLine.style.setProperty('max-height', 'none', 'important');
+        toLine.style.setProperty('overflow', 'visible', 'important');
+    }
+    if (subjectLine) {
+        subjectLine.style.setProperty('font-size', subjectSize + 'vh', 'important');
+        subjectLine.style.setProperty('line-height', '1.1', 'important');
+        subjectLine.style.setProperty('max-height', 'none', 'important');
+        subjectLine.style.setProperty('overflow', 'visible', 'important');
+    }
+    if (textContent) {
+        textContent.style.setProperty('font-size', textSize + 'vh', 'important');
+        textContent.style.setProperty('line-height', '1.1', 'important');
+        textContent.style.setProperty('max-height', 'none', 'important');
+        textContent.style.setProperty('overflow', 'visible', 'important');
+    }
+    
+    console.log(`🎯 WORKING algorithm applied: από=${fromSize.toFixed(1)}vh, προς=${toSize.toFixed(1)}vh, θέμα=${subjectSize.toFixed(1)}vh, κείμενο=${textSize.toFixed(1)}vh`);
+}
+
+// ========== SECONDARY TIMER FUNCTIONS (vMix Integration) ==========
+let vmixHost = '192.168.5.123';
+let vmixPort = '8088';
+let vmixEnabled = true;
+
+function updateSecondaryTimer(data) {
+    const secondaryTimer = document.getElementById('secondary-timer');
+    const titleElement = document.getElementById('secondary-timer-title');
+    const timeElement = document.getElementById('secondary-timer-time');
+    const progressElement = document.getElementById('secondary-progress-bar');
+    
+    // Αν το vMix secondary timer είναι απενεργοποιημένο, μην εμφανίζεις τίποτα
+    if (!vmixEnabled) {
+        secondaryTimer.style.display = 'none';
+        return;
+    }
+    
+    if (!data || !data.active || data.remaining <= 0) {
+        // Slide out animation όταν τελειώνει το video
+        if (secondaryTimer.style.display === 'block') {
+            secondaryTimer.classList.add('slide-out');
+            
+            // Κρύψιμο μετά το animation (800ms)
+            setTimeout(() => {
+                secondaryTimer.style.display = 'none';
+                secondaryTimer.classList.remove('slide-out');
+            }, 800);
+        }
+        return;
+    }
+    
+    // Εμφάνιση secondary timer
+    secondaryTimer.style.display = 'block';
+    secondaryTimer.classList.remove('slide-out');
+    
+    // Ενημέρωση τίτλου
+    titleElement.textContent = `🎬 ${data.title}`;
+    
+    // Ενημέρωση χρόνου (remaining)
+    const minutes = Math.floor(data.remaining / 60);
+    const seconds = data.remaining % 60;
+    timeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Ενημέρωση progress bar
+    const progressPercent = data.total > 0 ? ((data.total - data.remaining) / data.total) * 100 : 0;
+    progressElement.style.width = `${Math.min(100, Math.max(0, progressPercent))}%`;
+    
+    // Λογική χρωμάτων progress bar βάσει υπολειπόμενου χρόνου
+    const remainingPercent = data.total > 0 ? (data.remaining / data.total) * 100 : 0;
+    
+    // Καθαρισμός classes
+    progressElement.classList.remove('warning', 'danger');
+    
+    if (remainingPercent <= 10) {
+        // Κόκκινο - 10% ή λιγότερο χρόνος απομένει
+        progressElement.classList.add('danger');
+    } else if (remainingPercent <= 25) {
+        // Πορτοκαλί - 25% ή λιγότερο χρόνος απομένει
+        progressElement.classList.add('warning');
+    }
+    // Αλλιώς παραμένει πράσινο (default)
+    
+    console.log(`📹 Secondary timer updated: ${data.title} - ${minutes}:${seconds.toString().padStart(2, '0')} remaining (${remainingPercent.toFixed(1)}% left)`);
+}
+
+
+// Format time για secondary timer
+function formatSecondaryTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <script src="libs/NoSleep.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .timer-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer-time {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .timer-status {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .timer-status.running { color: #27ae60; }
+        .timer-status.paused { color: #f39c12; }
+        .timer-status.warning { color: #e67e22; }
+        .timer-status.danger { color: #e74c3c; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #f39c12, #e74c3c);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .control-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-pause {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .time-adjust {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-adjust {
+            padding: 12px;
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-adjust:hover {
+            background: rgba(52, 152, 219, 1);
+        }
+
+        .btn-adjust.minus {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        .btn-adjust.minus:hover {
+            background: rgba(231, 76, 60, 1);
+        }
+
+        .quick-set {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-quick {
+            padding: 10px;
+            background: rgba(155, 89, 182, 0.8);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-quick:hover {
+            background: rgba(155, 89, 182, 1);
+        }
+
+        .message-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .message-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-message {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .btn-flash {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+        }
+
+        .connection-status.connected {
+            background: rgba(39, 174, 96, 0.9);
+        }
+
+        @media (max-width: 600px) {
+            .timer-time {
+                font-size: 3rem;
+            }
+            
+            .control-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .time-adjust {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-set {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connection-status">
+        Αποσυνδέθηκε
+    </div>
+
+    <div class="container">
+        <!-- Timer Display -->
+        <div class="timer-display">
+            <div class="timer-time" id="timer-time">15:00</div>
+            <div class="timer-status" id="timer-status">Σταματημένο</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Timer Controls -->
+        <div class="control-section">
+            <div class="section-title">Έλεγχος Χρονομέτρου</div>
+            
+            <div class="control-buttons">
+                <button class="btn btn-start" onclick="startTimer()">Έναρξη</button>
+                <button class="btn btn-pause" onclick="pauseTimer()">Παύση</button>
+                <button class="btn btn-reset" onclick="resetTimer()">Επαναφορά</button>
+            </div>
+
+            <div class="time-adjust">
+                <button class="btn-adjust minus" onclick="adjustTime(-300)">-5 λεπτά</button>
+                <button class="btn-adjust minus" onclick="adjustTime(-60)">-1 λεπτό</button>
+                <button class="btn-adjust minus" onclick="adjustTime(-10)">-10 δευτ</button>
+                <button class="btn-adjust" onclick="adjustTime(10)">+10 δευτ</button>
+                <button class="btn-adjust" onclick="adjustTime(60)">+1 λεπτό</button>
+                <button class="btn-adjust" onclick="adjustTime(300)">+5 λεπτά</button>
+            </div>
+
+            <div class="quick-set">
+                <button class="btn-quick" onclick="setTimer(5)">5 λεπτά</button>
+                <button class="btn-quick" onclick="setTimer(10)">10 λεπτά</button>
+                <button class="btn-quick" onclick="setTimer(15)">15 λεπτά</button>
+                <button class="btn-quick" onclick="setTimer(30)">30 λεπτά</button>
+            </div>
+        </div>
+
+        <!-- Message Controls -->
+        <div class="message-section">
+            <div class="section-title">Μηνύματα</div>
+            
+            <textarea class="message-input" id="message-input" placeholder="Εισάγετε μήνυμα..."></textarea>
+            
+            <div class="message-buttons">
+                <button class="btn-message btn-send" onclick="sendMessage()">Αποστολή</button>
+                <button class="btn-message btn-clear" onclick="clearMessage()">Καθαρισμός</button>
+                <button class="btn-message btn-flash" onclick="flashAlert()">⚡ Flash</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timerData = {
+            timeLeft: 900, // 15 minutes
+            originalTime: 900,
+            isRunning: false,
+            status: 'normal'
+        };
+
+        // Get server IP from URL or default to current host
+        const serverIP = window.location.hostname;
+        const serverPort = window.location.port || '3000';
+        const baseURL = `http://${serverIP}:${serverPort}`;
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const timeElement = document.getElementById('timer-time');
+            const statusElement = document.getElementById('timer-status');
+            const progressElement = document.getElementById('progress-fill');
+
+            // Format time
+            const absTime = Math.abs(timerData.timeLeft);
+            const hours = Math.floor(absTime / 3600);
+            const minutes = Math.floor((absTime % 3600) / 60);
+            const seconds = absTime % 60;
+
+            let timeString;
+            if (hours > 0) {
+                timeString = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            if (timerData.timeLeft < 0) {
+                timeString = '+' + timeString;
+            }
+
+            timeElement.textContent = timeString;
+
+            // Update status
+            let statusText = 'Σταματημένο';
+            let statusClass = '';
+
+            if (timerData.isRunning) {
+                if (timerData.timeLeft < 0) {
+                    statusText = 'Υπερβάλλων Χρόνος';
+                    statusClass = 'danger';
+                } else if (timerData.timeLeft === 0) {
+                    statusText = 'Τέλος Χρόνου';
+                    statusClass = 'danger';
+                } else if (timerData.status === 'warning') {
+                    statusText = 'Προειδοποίηση';
+                    statusClass = 'warning';
+                } else {
+                    statusText = 'Σε Λειτουργία';
+                    statusClass = 'running';
+                }
+            } else {
+                statusText = 'Σε Παύση';
+                statusClass = 'paused';
+            }
+
+            statusElement.textContent = statusText;
+            statusElement.className = `timer-status ${statusClass}`;
+
+            // Update progress bar
+            const percentage = Math.max(0, (timerData.timeLeft / timerData.originalTime) * 100);
+            progressElement.style.width = `${percentage}%`;
+        }
+
+        // API calls
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(`${baseURL}${endpoint}`, options);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    updateConnectionStatus(true);
+                    return result;
+                } else {
+                    throw new Error(result.error || 'API Error');
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                updateConnectionStatus(false);
+                throw error;
+            }
+        }
+
+        // Timer controls
+        async function startTimer() {
+            try {
+                await apiCall('/api/timer/start', 'POST');
+                timerData.isRunning = true;
+                updateTimerDisplay();
+            } catch (error) {
+                console.error('Start timer failed:', error);
+            }
+        }
+
+        async function pauseTimer() {
+            try {
+                await apiCall('/api/timer/pause', 'POST');
+                timerData.isRunning = false;
+                updateTimerDisplay();
+            } catch (error) {
+                console.error('Pause timer failed:', error);
+            }
+        }
+
+        async function resetTimer() {
+            try {
+                await apiCall('/api/timer/reset', 'POST');
+                timerData.isRunning = false;
+                updateTimerDisplay();
+            } catch (error) {
+                console.error('Reset timer failed:', error);
+            }
+        }
+
+        async function adjustTime(seconds) {
+            try {
+                const result = await apiCall(`/api/timer/adjust/${seconds}`, 'POST');
+                timerData.timeLeft = result.newTime;
+                updateTimerDisplay();
+            } catch (error) {
+                console.error('Adjust time failed:', error);
+            }
+        }
+
+        async function setTimer(minutes) {
+            try {
+                const result = await apiCall(`/api/timer/set/${minutes}`, 'POST');
+                timerData.timeLeft = result.seconds;
+                timerData.originalTime = result.seconds;
+                timerData.isRunning = false;
+                updateTimerDisplay();
+            } catch (error) {
+                console.error('Set timer failed:', error);
+            }
+        }
+
+        // Message controls
+        async function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+
+            if (!message) return;
+
+            try {
+                await apiCall('/api/message', 'POST', { message });
+                messageInput.value = '';
+            } catch (error) {
+                console.error('Send message failed:', error);
+            }
+        }
+
+        async function clearMessage() {
+            try {
+                await apiCall('/api/message/clear', 'POST');
+                document.getElementById('message-input').value = '';
+            } catch (error) {
+                console.error('Clear message failed:', error);
+            }
+        }
+
+        async function flashAlert() {
+            try {
+                await apiCall('/api/flash', 'POST');
+            } catch (error) {
+                console.error('Flash alert failed:', error);
+            }
+        }
+
+        // Status updates
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            if (connected) {
+                statusElement.textContent = 'Συνδέθηκε';
+                statusElement.className = 'connection-status connected';
+            } else {
+                statusElement.textContent = 'Αποσυνδέθηκε';
+                statusElement.className = 'connection-status';
+            }
+        }
+
+        // Poll for status updates
+        async function pollStatus() {
+            try {
+                const status = await apiCall('/api/status');
+                timerData = {
+                    timeLeft: status.timeLeft,
+                    originalTime: status.originalTime,
+                    isRunning: status.isRunning,
+                    status: status.status
+                };
+                updateTimerDisplay();
+            } catch (error) {
+                // Status polling failed - will try again
+            }
+        }
+
+        // Initialize
+        updateTimerDisplay();
+        updateConnectionStatus(false);
+
+        // NoSleep για να μην σβήνει η οθόνη
+        const noSleep = new NoSleep();
+        let noSleepEnabled = false;
+
+        // Ενεργοποίηση NoSleep με οποιοδήποτε κλικ
+        document.addEventListener('click', function enableNoSleep() {
+            if (!noSleepEnabled) {
+                noSleep.enable();
+                noSleepEnabled = true;
+                console.log('NoSleep enabled - η οθόνη δεν θα σβήσει');
+            }
+        }, { once: true }); // Μόνο μια φορά
+
+        // Start status polling
+        setInterval(pollStatus, 1000);
+
+        // Initial status check
+        pollStatus();
+    </script>
+</body>
+</html>

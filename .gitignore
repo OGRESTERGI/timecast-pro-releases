@@ -1,0 +1,142 @@
+# ===================================
+# TimeCast Pro - Production .gitignore
+# ===================================
+
+# BUILD OUTPUTS - NEVER COMMIT
+dist/
+build/
+*.exe
+*.zip
+*.dmg
+*.AppImage
+*.msi
+*.deb
+*.rpm
+
+# NODE MODULES
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# DEVELOPMENT FILES
+.cache/
+.temp/
+*.log
+*.pid
+server-pid.txt
+server-port.txt
+server_output.txt
+
+# USER DATA - SENSITIVE
+data/
+uploads/
+*.json
+!package.json
+!package-lock.json
+!language-config.json
+!tsconfig.json
+
+# BACKUPS
+backup*/
+temp_backup/
+*_backup.js
+*_backup.html
+backups/
+.git-backup-*
+
+# TEMP FILES
+temp/
+*.tmp
+*.temp
+*.companionconfig
+
+# EXCEL/OFFICE FILES
+*.xlsx
+*.xls
+*.csv
+!test-data.csv
+
+# IMAGES - Large assets
+*.jpg
+*.jpeg
+*.png
+*.gif
+!assets/*.png
+!assets/*.jpg
+!timecast*.png
+
+# VIDEOS
+*.mp4
+*.avi
+*.mov
+*.wmv
+
+# OS FILES
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# IDE FILES
+.vscode/
+.idea/
+*.sublime-*
+
+# SPECIFIC TIMECAST FILES
+vmix_api_response.xml
+.claude/
+CLAUDE.local.md
+
+# LICENSE & TRIAL DATA - SENSITIVE
+license.json
+trial.json
+license.json.backup
+trial-terminated.json
+
+# COMPANION MODULE BUILDS
+timecast-pro-*.tgz
+pkg/
+companion-modules/*.tgz
+
+# AUTO-BACKUP FILES
+Last_Timecast_auto_backup.json
+timer-backup.json
+timer-settings-*.json
+timer-auto-save.json
+
+# TEST FILES
+test-*.js
+*-test.js
+*-test.py
+*-test.html
+telnet-test.js
+
+# OBSOLETE FILES
+obsolete-files/
+old-builds/
+archived/
+
+# GREEK FILENAMES (user data)
+*Συνεδριο*
+*Καρδιολογίας*
+*προγραμμα*
+*Στιγμιότυπο*
+
+# PYTHON
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# SCRIPTS (development only)
+reset-trial.ps1
+yeelight-*.py
+yeelight-*.js
+yeelightlamps.js
+yeelight-integration.js
+nul

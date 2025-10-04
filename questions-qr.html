@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - TimeCast™ Pro Questions Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ecf0f1;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            font-size: 2.2em;
+            margin: 0 0 8px 0;
+            font-weight: 300;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px 0;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            max-width: 85vh;
+            max-height: 85vh;
+            flex-shrink: 0;
+        }
+
+        #qrcode {
+            display: inline-block;
+        }
+
+        #qrcode img,
+        #qrcode canvas {
+            max-width: 100% !important;
+            height: auto !important;
+            width: auto !important;
+        }
+
+        .network-info {
+            font-size: 1.1em;
+            color: white;
+            margin: 5px 0;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.05);
+        }
+
+        .refresh-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 255, 136, 0.9);
+            color: black;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .refresh-indicator.show {
+            opacity: 1;
+        }
+
+
+
+        @media (max-width: 1200px) {
+            .title {
+                font-size: 2em;
+            }
+            
+            .network-info {
+                font-size: 1em;
+            }
+            
+            .qr-container {
+                max-width: 70vh;
+                max-height: 70vh;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px 10px;
+            }
+            
+            .title {
+                font-size: 1.8em;
+                margin: 0 0 10px 0;
+            }
+            
+            .network-info {
+                font-size: 0.9em;
+                margin: 8px 0;
+            }
+            
+            .qr-container {
+                max-width: 65vw;
+                max-height: 65vh;
+                padding: 12px;
+            }
+            
+            .fullscreen-btn {
+                padding: 12px 16px;
+                font-size: 1.1em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px 5px;
+            }
+            
+            .title {
+                font-size: 1.5em;
+                margin: 0 0 8px 0;
+            }
+            
+            .network-info {
+                font-size: 0.8em;
+                margin: 5px 0;
+            }
+            
+            .qr-container {
+                max-width: 80vw;
+                max-height: 60vh;
+                padding: 10px;
+            }
+            
+            .fullscreen-btn {
+                top: 15px;
+                right: 15px;
+                padding: 10px 12px;
+                font-size: 1em;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .title {
+                font-size: 1.2em;
+                margin: 0 0 5px 0;
+            }
+            
+            .network-info {
+                font-size: 0.7em;
+                margin: 3px 0;
+            }
+            
+            .qr-container {
+                max-width: 85vw;
+                max-height: 50vh;
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 8px 3px;
+            }
+        }
+    </style>
+    <!-- Include QRCode.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="loadFallbackScript()"></script>
+    <script>
+        function loadFallbackScript() {
+            console.log('CDN failed, loading local library...');
+            const script = document.createElement('script');
+            script.src = 'libs/qrcode.min.js';
+            script.onload = function() {
+                console.log('Local QR library loaded successfully');
+                // Retry QR generation if it was already attempted
+                if (typeof generateQRCode === 'function') {
+                    setTimeout(generateQRCode, 500);
+                }
+            };
+            script.onerror = function() {
+                console.error('Both CDN and local QR library failed');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+</head>
+<body>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+    <div class="refresh-indicator" id="refreshIndicator">🔄 Refreshing...</div>
+    
+    <div class="container">
+        <div class="title">Scan to visit Questions Form</div>
+        
+        <div class="qr-container">
+            <div id="qrcode" style="max-width: 800px; height: auto;"></div>
+        </div>
+        
+        <div class="network-info">
+            Network Status: <span id="networkStatus">Checking...</span>
+        </div>
+    </div>
+
+    <script>
+        let currentURL = '';
+        
+        async function generateQRCode() {
+            try {
+                // Try to get network info from API, fallback to localhost
+                let baseURL = 'http://localhost:3000';
+                let networkIP = null;
+                
+                try {
+                    const response = await fetch('/api/network-info');
+                    const data = await response.json();
+                    if (data.networkURL) {
+                        baseURL = data.networkURL;
+                        networkIP = data.networkIP;
+                    }
+                } catch (apiError) {
+                    console.log('API not available, using localhost:', apiError.message);
+                }
+                
+                currentURL = `${baseURL}/questions-form.html`;
+                
+                // URL display removed from layout
+                
+                // Update network status
+                const networkStatus = document.getElementById('networkStatus');
+                if (networkIP) {
+                    networkStatus.innerHTML = `✅`;
+                    networkStatus.style.color = '#00ff88';
+                } else {
+                    networkStatus.innerHTML = `⚠️`;
+                    networkStatus.style.color = '#ffaa00';
+                }
+                
+                // Generate QR code using qrcodejs library (works offline!)
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = ''; // Clear previous QR
+                
+                if (typeof QRCode !== 'undefined') {
+                    try {
+                        new QRCode(qrContainer, {
+                            text: currentURL,
+                            width: 800,
+                            height: 800,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                        console.log('✅ QR code generated offline successfully');
+                        return;
+                    } catch (qrError) {
+                        console.error('QRCode library error:', qrError);
+                    }
+                } else {
+                    console.log('QRCode library not loaded yet, will retry...');
+                }
+                
+                // Fallback: Use online service
+                const qrImg = document.createElement('img');
+                qrImg.style.cssText = 'max-width: 800px; height: auto;';
+                qrImg.alt = 'QR Code';
+                
+                const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=${encodeURIComponent(currentURL)}`;
+                
+                qrImg.onload = function() {
+                    qrContainer.appendChild(qrImg);
+                    console.log('✅ QR code generated online successfully');
+                };
+                
+                qrImg.onerror = function() {
+                    console.error('❌ Both online and offline QR generation failed');
+                    // Show text fallback
+                    const fallbackDiv = document.createElement('div');
+                    fallbackDiv.style.cssText = 'background: #333; color: white; padding: 20px; border-radius: 10px; font-family: monospace; word-break: break-all; font-size: 0.9em; max-width: 256px;';
+                    fallbackDiv.innerHTML = `
+                        <div style="text-align: center; margin-bottom: 15px; color: #ff9800;">
+                            📴 Offline Mode - Library Loading
+                        </div>
+                        <div style="text-align: center; margin-bottom: 10px; font-size: 1.1em;">
+                            Use this URL manually:
+                        </div>
+                        <div style="background: #555; padding: 10px; border-radius: 5px; text-align: center;">
+                            ${currentURL}
+                        </div>
+                    `;
+                    qrContainer.appendChild(fallbackDiv);
+                };
+                
+                qrImg.src = qrURL;
+                
+            } catch (error) {
+                console.error('Error in generateQRCode:', error);
+                
+                // Ultimate fallback
+                currentURL = 'http://localhost:3000/questions-form.html';
+                document.getElementById('networkStatus').innerHTML = '❌';
+                document.getElementById('networkStatus').style.color = '#ff6666';
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #ff4444; color: white; padding: 15px; border-radius: 10px; margin: 10px 0;';
+                errorDiv.textContent = '❌ QR Code generation failed. Please copy the URL below manually.';
+                document.getElementById('qrcode').parentNode.appendChild(errorDiv);
+            }
+        }
+        
+        
+        // Fullscreen functionality
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    document.querySelector('.fullscreen-btn').textContent = '⛶';
+                }).catch(err => {
+                    console.log('Error enabling fullscreen:', err);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    document.querySelector('.fullscreen-btn').textContent = '⛶';
+                }).catch(err => {
+                    console.log('Error exiting fullscreen:', err);
+                });
+            }
+        }
+
+        // Auto-refresh functionality
+        function showRefreshIndicator() {
+            const indicator = document.getElementById('refreshIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        async function refreshWithIndicator() {
+            showRefreshIndicator();
+            await generateQRCode();
+        }
+
+        // Generate QR code when page loads
+        generateQRCode();
+        
+        // Refresh QR code every 1 minute (in case IP changes)
+        setInterval(refreshWithIndicator, 60000);
+
+        // Handle fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.querySelector('.fullscreen-btn');
+            btn.textContent = '⛶';
+        });
+
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>

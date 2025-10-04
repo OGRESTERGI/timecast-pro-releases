@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Επιβεβαίωση</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .dialog-container {
+            background: #2c3e50;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .dialog-title {
+            margin: 0 0 15px 0;
+            color: #ff8c00;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .dialog-message {
+            margin: 0 0 25px 0;
+            color: white;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .dialog-details {
+            margin: 10px 0 25px 0;
+            color: #bdc3c7;
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .btn-cancel {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-confirm {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <h3 class="dialog-title" id="dialogTitle">Επιβεβαίωση</h3>
+        <p class="dialog-message" id="dialogMessage">Είστε σίγουροι;</p>
+        <div class="dialog-details" id="dialogDetails" style="display: none;">
+            • Όλες οι συνδέσεις με clients θα διακοπούν<br>
+            • Ο server θα τερματιστεί<br>
+            • Το τρέχον χρονόμετρο θα σταματήσει
+        </div>
+        <div class="buttons">
+            <button class="btn btn-cancel" onclick="cancelAction()" id="cancelBtn">Άκυρο</button>
+            <button class="btn btn-confirm" onclick="confirmAction()" id="confirmBtn">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // Debug logging function that sends to main process
+        function debugLog(message) {
+            if (message.includes('keydown') || message.includes('Key') || message.includes('ESC') || message.includes('ENTER')) {
+                console.log(message);
+                ipcRenderer.send('dialog-debug-log', message);
+            }
+        }
+        
+        // Auto focus on confirm button (like the admin version)
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('🔍 DOM loaded - setting up focus');
+            document.getElementById('confirmBtn').focus();
+            // Ensure window has focus for keyboard events
+            window.focus();
+            document.body.focus();
+            
+            // Additional focus setup
+            setTimeout(() => {
+                debugLog('🔍 Delayed focus setup');
+                document.getElementById('confirmBtn').focus();
+                window.focus();
+            }, 200);
+        });
+
+        function cancelAction() {
+            debugLog('🔴 Cancel button clicked');
+            ipcRenderer.send('simple-confirm-response', false);
+        }
+
+        function confirmAction() {
+            debugLog('🟢 Confirm button clicked');
+            ipcRenderer.send('simple-confirm-response', true);
+        }
+
+        // Multiple keyboard event listeners for better coverage
+        document.addEventListener('keydown', (e) => {
+            debugLog(`⌨️ Document keydown - Key: ${e.key}, Active: ${document.activeElement.tagName}`);
+            handleKeyPress(e);
+        });
+        
+        window.addEventListener('keydown', (e) => {
+            debugLog(`⌨️ Window keydown - Key: ${e.key}`);
+            handleKeyPress(e);
+        });
+        
+        document.body.addEventListener('keydown', (e) => {
+            debugLog(`⌨️ Body keydown - Key: ${e.key}`);
+            handleKeyPress(e);
+        });
+        
+        function handleKeyPress(e) {
+            if (e.key === 'Escape') {
+                debugLog('🔑 ESC pressed - canceling');
+                e.preventDefault();
+                e.stopPropagation();
+                cancelAction();
+            } else if (e.key === 'Enter') {
+                debugLog('🔑 Enter pressed - confirming');
+                e.preventDefault();
+                e.stopPropagation();
+                confirmAction();
+            }
+        }
+
+        // Handle native keyboard shortcuts from main process
+        ipcRenderer.on('force-cancel', () => {
+            debugLog('🔑 Native ESC - force cancel');
+            cancelAction();
+        });
+        
+        ipcRenderer.on('force-confirm', () => {
+            debugLog('🔑 Native ENTER - force confirm');
+            confirmAction();
+        });
+
+        // Handle dynamic message setting
+        ipcRenderer.on('set-dialog-message', (event, data) => {
+            if (data.title) {
+                document.getElementById('dialogTitle').textContent = data.title;
+            }
+            if (data.message) {
+                document.getElementById('dialogMessage').textContent = data.message;
+            }
+            if (data.confirmText) {
+                document.getElementById('confirmBtn').textContent = data.confirmText;
+            }
+            if (data.cancelText) {
+                document.getElementById('cancelBtn').textContent = data.cancelText;
+            }
+            
+            // Show details for exit confirmation
+            if (data.message && data.message.includes('κλείσετε την εφαρμογή')) {
+                document.getElementById('dialogDetails').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
