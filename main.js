@@ -6753,50 +6753,8 @@ app.on('window-all-closed', () => {
     console.log('🔄 All windows closed - shutdown handled by close event');
 });
 
-// 🔥 CRITICAL: Auto-save before quit για τέλεια session continuity
-app.on('before-quit', async (event) => {
-    if (!isShuttingDown) {
-        event.preventDefault(); // Σταματά το quit μέχρι να τελειώσει το auto-save
-        console.log('🔥 before-quit: Triggering final auto-save...');
-        
-        // Check if mainWindow exists AND webContents is available
-        if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
-            try {
-                const result = await mainWindow.webContents.executeJavaScript(`
-                    (async () => {
-                        try {
-                            if (typeof performSilentAutoSave === 'function') {
-                                await performSilentAutoSave();
-                                console.log('Final auto-save completed successfully');
-                                return { success: true, message: 'Auto-save completed' };
-                            } else {
-                                console.log('performSilentAutoSave function not available');
-                                return { success: false, message: 'Function not available' };
-                            }
-                        } catch (err) {
-                            console.error('Auto-save error:', err.message);
-                            return { success: false, message: err.message };
-                        }
-                    })();
-                `);
-
-                if (result.success) {
-                    console.log('Auto-save before quit: SUCCESS');
-                } else {
-                    console.log('Auto-save before quit: FAILED -', result.message);
-                }
-            } catch (error) {
-                console.log('Final auto-save skipped: Window already closed or destroyed');
-            }
-        } else {
-            console.log('Final auto-save skipped: mainWindow not available');
-        }
-
-        // Τώρα μπορεί να κλείσει η εφαρμογή
-        isShuttingDown = true; // Set flag πριν το quit για να μην ξανά-trigger το before-quit
-        app.quit();
-    }
-});
+// Note: Auto-save is handled in performCleanShutdown() function
+// No need for before-quit event - it runs AFTER window close and causes webContents errors
 
 // Για macOS - επαναφορά παραθύρου
 app.on('activate', () => {
@@ -6956,7 +6914,8 @@ async function performCleanShutdown() {
     try {
         // 0. 🔥 CRITICAL: Final auto-save before shutdown
         console.log('💾 Final auto-save before shutdown...');
-        if (mainWindow && !mainWindow.isDestroyed()) {
+        // Check mainWindow AND webContents exist before executing JavaScript
+        if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
             try {
                 const result = await mainWindow.webContents.executeJavaScript(`
                     (async () => {
@@ -6982,10 +6941,10 @@ async function performCleanShutdown() {
                     console.log('Auto-save before shutdown: FAILED -', result.message);
                 }
             } catch (error) {
-                console.log('Final auto-save failed: Script failed to execute, this normally means an error was thrown. Check the renderer console for the error.');
+                console.log('⚠️ Final auto-save skipped: Window closing or already closed');
             }
         } else {
-            console.log('⚠️ Main window not available for final auto-save');
+            console.log('⚠️ Final auto-save skipped: mainWindow or webContents not available');
         }
         
         // 1. Close timer window first
