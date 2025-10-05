@@ -136,7 +136,9 @@ class UpdateChecker {
                                 asset.name.endsWith('.exe')
                             );
 
-                            console.log(`   Download URL: ${exeAsset ? exeAsset.browser_download_url : 'N/A'}`);
+                            // Use API URL για private repos (με token authentication)
+                            const downloadUrl = exeAsset ? exeAsset.url : release.html_url;
+                            console.log(`   Download URL (API): ${downloadUrl}`);
 
                             resolve({
                                 updateAvailable: true,
@@ -144,7 +146,7 @@ class UpdateChecker {
                                 latestVersion: latestVersion,
                                 releaseDate: release.published_at,
                                 changelog: release.body || 'No changelog available',
-                                downloadUrl: exeAsset ? exeAsset.browser_download_url : release.html_url,
+                                downloadUrl: downloadUrl,
                                 releasePage: release.html_url
                             });
                         } else {

@@ -6704,12 +6704,14 @@ app.whenReady().then(async () => {
         if (updateChecker && !updateInfo) {
             const status = updateChecker.getStatus();
             if (status.updateAvailable && status.latestRelease) {
+                const exeAsset = status.latestRelease.assets.find(a => a.name.endsWith('.exe'));
                 updateInfo = {
                     updateAvailable: true,
                     latestVersion: status.latestRelease.tag_name.replace(/^v/, ''),
                     currentVersion: updateChecker.currentVersion,
                     changelog: status.latestRelease.body,
-                    downloadUrl: status.latestRelease.assets.find(a => a.name.endsWith('.exe'))?.browser_download_url || status.latestRelease.html_url
+                    // Use API URL για private repos (με token authentication)
+                    downloadUrl: exeAsset?.url || exeAsset?.browser_download_url || status.latestRelease.html_url
                 };
                 // Refresh menu με update badge
                 createApplicationMenu();
