@@ -7269,7 +7269,16 @@ async function showUpdateDialog(updateInfo) {
             // Handle redirects
             if (response.statusCode === 302 || response.statusCode === 301) {
                 console.log('🔄 Following redirect...');
-                https.get(response.headers.location, (redirectResponse) => {
+                const redirectUrl = new URL(response.headers.location);
+                const redirectOptions = {
+                    hostname: redirectUrl.hostname,
+                    path: redirectUrl.pathname + redirectUrl.search,
+                    headers: {
+                        'User-Agent': 'TimeCast-Pro-Updater',
+                        'Accept': 'application/octet-stream'
+                    }
+                };
+                https.get(redirectOptions, (redirectResponse) => {
                     totalBytes = parseInt(redirectResponse.headers['content-length'], 10);
 
                     redirectResponse.on('data', (chunk) => {
