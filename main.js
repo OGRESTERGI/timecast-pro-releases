@@ -7540,7 +7540,8 @@ function showHdmiWarningDialog(type, title, message, detail, options = {}) {
                 message: message,
                 detail: detail,
                 okText: options.okText || 'Εντάξει',
-                cancelText: options.cancelText || 'Ακύρωση'
+                cancelText: options.cancelText || 'Ακύρωση',
+                autoCloseTimeout: 3000 // Auto-close μετά από 3 δευτερόλεπτα
             });
 
             hdmiWarningDialog.show();
@@ -7553,6 +7554,14 @@ function showHdmiWarningDialog(type, title, message, detail, options = {}) {
                     hdmiWarningDialog.webContents.send('force-cancel');
                 }
             });
+
+            // Auto-close timeout (3 seconds)
+            setTimeout(() => {
+                console.log('[HDMI DIALOG] Auto-closing after 3 seconds');
+                if (hdmiWarningDialog && !hdmiWarningDialog.isDestroyed()) {
+                    hdmiWarningDialog.webContents.send('force-cancel');
+                }
+            }, 3000);
         });
 
         // Handle dialog result

@@ -115,6 +115,13 @@
         .btn:active {
             transform: translateY(0);
         }
+
+        .countdown-timer {
+            margin-top: 15px;
+            color: #95a5a6;
+            font-size: 12px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -123,7 +130,7 @@
         <h3 class="dialog-title" id="dialog-title">Προειδοποίηση HDMI</h3>
         <p class="dialog-message" id="dialog-message">Δεν έχει συνδεθεί δεύτερη οθόνη!</p>
         <div class="detail-text" id="dialog-detail">Συνδέστε μια δεύτερη οθόνη (HDMI/DisplayPort/USB-C) και δοκιμάστε ξανά.</div>
-        
+
         <div class="dialog-buttons">
             <button class="btn btn-primary" onclick="closeDialog('ok')" id="ok-btn">
                 Εντάξει
@@ -132,31 +139,37 @@
                 Ακύρωση
             </button>
         </div>
+
+        <div class="countdown-timer" id="countdown-timer" style="display: none;">
+            Αυτόματο κλείσιμο σε <span id="countdown-seconds">3</span> δευτερόλεπτα...
+        </div>
     </div>
 
     <script>
         const { ipcRenderer } = require('electron');
+        let countdownInterval = null;
+        let secondsLeft = 3;
 
         // Λήψη παραμέτρων από την κύρια εφαρμογή
         ipcRenderer.on('dialog-data', (event, data) => {
             console.log('Received dialog data:', data);
-            
+
             if (data.title) {
                 document.getElementById('dialog-title').textContent = data.title;
             }
-            
+
             if (data.message) {
                 document.getElementById('dialog-message').textContent = data.message;
             }
-            
+
             if (data.detail) {
                 document.getElementById('dialog-detail').textContent = data.detail;
             }
-            
+
             // Προσαρμογή κουμπιών βάσει τύπου
             const okBtn = document.getElementById('ok-btn');
             const cancelBtn = document.getElementById('cancel-btn');
-            
+
             if (data.type === 'confirm') {
                 cancelBtn.style.display = 'block';
                 okBtn.textContent = data.okText || 'Ναι';
@@ -165,12 +178,44 @@
                 cancelBtn.style.display = 'none';
                 okBtn.textContent = data.okText || 'Εντάξει';
             }
+
+            // Ξεκινήστε countdown αν υπάρχει autoCloseTimeout
+            if (data.autoCloseTimeout) {
+                const countdownDiv = document.getElementById('countdown-timer');
+                const countdownSpan = document.getElementById('countdown-seconds');
+                countdownDiv.style.display = 'block';
+
+                secondsLeft = Math.ceil(data.autoCloseTimeout / 1000);
+                countdownSpan.textContent = secondsLeft;
+
+                countdownInterval = setInterval(() => {
+                    secondsLeft--;
+                    countdownSpan.textContent = secondsLeft;
+
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdownInterval);
+                    }
+                }, 1000);
+            }
         });
 
         function closeDialog(result) {
             console.log('Dialog closed with result:', result);
+
+            // Cleanup countdown interval
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+
             ipcRenderer.send('dialog-result', result);
         }
+
+        // Handle force cancel από main process (ESC key ή auto-close)
+        ipcRenderer.on('force-cancel', () => {
+            console.log('Force cancel received');
+            closeDialog('cancel');
+        });
 
         // ESC key support
         document.addEventListener('keydown', (event) => {
