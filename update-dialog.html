@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Available</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1E2B36, #2C3E50);
+            color: #F2F0EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .dialog-container {
+            background: rgba(30, 43, 54, 0.95);
+            border: 1px solid rgba(242, 240, 235, 0.2);
+            border-radius: 12px;
+            padding: 0;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(242, 240, 235, 0.1);
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 300;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            padding: 25px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .version-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .version-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .version-label {
+            opacity: 0.8;
+        }
+
+        .version-value {
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        .license-note {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .changelog-section {
+            margin-top: 20px;
+        }
+
+        .changelog-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #3498db;
+        }
+
+        .changelog-content {
+            background: rgba(242, 240, 235, 0.05);
+            border: 1px solid rgba(242, 240, 235, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .changelog-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .changelog-content li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .changelog-content li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .buttons {
+            padding: 20px 25px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid rgba(242, 240, 235, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(242, 240, 235, 0.1);
+            color: #F2F0EB;
+            border: 1px solid rgba(242, 240, 235, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(242, 240, 235, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Scrollbar styling */
+        .content::-webkit-scrollbar,
+        .changelog-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track,
+        .changelog-content::-webkit-scrollbar-track {
+            background: rgba(242, 240, 235, 0.1);
+            border-radius: 4px;
+        }
+
+        .content::-webkit-scrollbar-thumb,
+        .changelog-content::-webkit-scrollbar-thumb {
+            background: rgba(242, 240, 235, 0.3);
+            border-radius: 4px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover,
+        .changelog-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(242, 240, 235, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <div class="header">
+            <div class="logo">⏱️</div>
+            <h1 class="title" id="dialogTitle">Νέα Έκδοση Διαθέσιμη!</h1>
+        </div>
+
+        <div class="content">
+            <div class="version-info">
+                <div class="version-row">
+                    <span class="version-label" id="currentLabel">Τρέχουσα έκδοση:</span>
+                    <span class="version-value" id="currentVersion">v6.7.0</span>
+                </div>
+                <div class="version-row">
+                    <span class="version-label" id="latestLabel">Νέα έκδοση:</span>
+                    <span class="version-value" id="latestVersion">v6.7.8</span>
+                </div>
+            </div>
+
+            <div class="license-note" id="licenseNote">
+                💡 Η άδεια χρήσης σας θα παραμείνει ενεργή στη νέα έκδοση.
+            </div>
+
+            <div class="changelog-section">
+                <div class="changelog-title" id="changelogTitle">Αλλαγές:</div>
+                <div class="changelog-content" id="changelogContent"></div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-secondary" id="laterBtn">Αργότερα</button>
+            <button class="btn btn-primary" id="downloadBtn">Κατέβασμα Ενημέρωσης</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Receive dialog data
+        ipcRenderer.on('update-dialog-data', (event, data) => {
+            console.log('Update dialog data:', data);
+
+            // Update text content
+            document.getElementById('dialogTitle').textContent = data.title;
+            document.getElementById('currentLabel').textContent = data.currentLabel;
+            document.getElementById('latestLabel').textContent = data.latestLabel;
+            document.getElementById('currentVersion').textContent = `v${data.currentVersion}`;
+            document.getElementById('latestVersion').textContent = `v${data.latestVersion}`;
+            document.getElementById('licenseNote').textContent = data.licenseNote;
+            document.getElementById('changelogTitle').textContent = data.changelogTitle;
+            document.getElementById('laterBtn').textContent = data.laterBtn;
+            document.getElementById('downloadBtn').textContent = data.downloadBtn;
+
+            // Format changelog με bullets
+            const changelogDiv = document.getElementById('changelogContent');
+            if (data.changelog) {
+                // Parse changelog and create bullet list
+                const lines = data.changelog.split('\n').filter(line => line.trim());
+                const ul = document.createElement('ul');
+                lines.forEach(line => {
+                    // Skip headers/titles
+                    if (line.startsWith('#') || line.startsWith('**')) {
+                        return;
+                    }
+                    // Remove existing bullets/dashes
+                    const cleanLine = line.replace(/^[•\-✓✅❌]\s*/, '').trim();
+                    if (cleanLine) {
+                        const li = document.createElement('li');
+                        li.textContent = cleanLine;
+                        ul.appendChild(li);
+                    }
+                });
+                changelogDiv.appendChild(ul);
+            }
+        });
+
+        // Button handlers
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            ipcRenderer.send('update-dialog-response', true);
+        });
+
+        document.getElementById('laterBtn').addEventListener('click', () => {
+            ipcRenderer.send('update-dialog-response', false);
+        });
+
+        // ESC key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                ipcRenderer.send('update-dialog-response', false);
+            }
+        });
+    </script>
+</body>
+</html>

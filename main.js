@@ -7173,18 +7173,60 @@ async function checkForUpdatesManually() {
 async function showUpdateDialog(updateInfo) {
     const isGreek = currentLanguage === 'el';
 
-    const title = isGreek ? 'Νέα Έκδοση Διαθέσιμη!' : 'New Version Available!';
-    const message = isGreek
-        ? `Η TimeCast™ Pro v${updateInfo.latestVersion} είναι διαθέσιμη!\n\nΤρέχουσα έκδοση: v${updateInfo.currentVersion}\nΝέα έκδοση: v${updateInfo.latestVersion}\n\n💡 Η άδεια χρήσης σας θα παραμείνει ενεργή στη νέα έκδοση.\n\nΑλλαγές:\n${updateInfo.changelog.substring(0, 200)}...`
-        : `TimeCast™ Pro v${updateInfo.latestVersion} is available!\n\nCurrent version: v${updateInfo.currentVersion}\nNew version: v${updateInfo.latestVersion}\n\n💡 Your license will remain active in the new version.\n\nChanges:\n${updateInfo.changelog.substring(0, 200)}...`;
+    return new Promise((resolve) => {
+        // Create update dialog window
+        const updateDialog = new BrowserWindow({
+            width: 600,
+            height: 650,
+            modal: true,
+            parent: mainWindow,
+            show: false,
+            frame: false,
+            transparent: false,
+            resizable: false,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false
+            }
+        });
 
-    const downloadBtn = isGreek ? 'Κατέβασμα Ενημέρωσης' : 'Download Update';
-    const laterBtn = isGreek ? 'Αργότερα' : 'Later';
+        updateDialog.loadFile('update-dialog.html');
 
-    // Use custom dialog instead of Windows native
-    const shouldDownload = await showSimpleConfirmDialog(title, message, downloadBtn, laterBtn);
+        updateDialog.once('ready-to-show', () => {
+            updateDialog.show();
 
-    if (shouldDownload) {
+            // Send dialog data
+            const dialogData = {
+                title: isGreek ? 'Νέα Έκδοση Διαθέσιμη!' : 'New Version Available!',
+                currentLabel: isGreek ? 'Τρέχουσα έκδοση:' : 'Current version:',
+                latestLabel: isGreek ? 'Νέα έκδοση:' : 'New version:',
+                currentVersion: updateInfo.currentVersion,
+                latestVersion: updateInfo.latestVersion,
+                licenseNote: isGreek
+                    ? '💡 Η άδεια χρήσης σας θα παραμείνει ενεργή στη νέα έκδοση.'
+                    : '💡 Your license will remain active in the new version.',
+                changelogTitle: isGreek ? 'Αλλαγές:' : 'Changes:',
+                changelog: updateInfo.changelog || (isGreek ? 'Δεν υπάρχουν αλλαγές' : 'No changes available'),
+                downloadBtn: isGreek ? 'Κατέβασμα Ενημέρωσης' : 'Download Update',
+                laterBtn: isGreek ? 'Αργότερα' : 'Later'
+            };
+
+            updateDialog.webContents.send('update-dialog-data', dialogData);
+        });
+
+        // Handle response
+        ipcMain.once('update-dialog-response', (event, shouldDownload) => {
+            updateDialog.close();
+            resolve(shouldDownload);
+        });
+
+        updateDialog.on('closed', () => {
+            resolve(false);
+        });
+    }).then(shouldDownload => {
+        if (!shouldDownload) return;
+
+        // Start download process
         // Silent background download με https module
         const https = require('https');
         const downloadsPath = app.getPath('downloads');
@@ -7308,7 +7350,7 @@ async function showUpdateDialog(updateInfo) {
                 'info'
             );
         });
-    }
+    });
 }
 
 // Simple Custom Info Dialog (OK button only)
