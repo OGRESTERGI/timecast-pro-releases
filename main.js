@@ -7297,6 +7297,12 @@ async function showUpdateDialog(updateInfo) {
                         file.close();
                         console.log('✅ Download completed!');
 
+                        // Close downloading dialog first
+                        if (exitDialog) {
+                            exitDialog.close();
+                            exitDialog = null;
+                        }
+
                         const successMsg = isGreek
                             ? `Η ενημέρωση κατέβηκε επιτυχώς!\n\nΑρχείο: ${fileName}\n\nΤοποθεσία: ${downloadsPath}\n\nΚλείστε την εφαρμογή και εκτελέστε το νέο αρχείο.`
                             : `Update downloaded successfully!\n\nFile: ${fileName}\n\nLocation: ${downloadsPath}\n\nClose the app and run the new file.`;
@@ -7336,6 +7342,12 @@ async function showUpdateDialog(updateInfo) {
                 file.on('finish', () => {
                     file.close();
                     console.log('✅ Download completed!');
+
+                    // Close downloading dialog first
+                    if (exitDialog) {
+                        exitDialog.close();
+                        exitDialog = null;
+                    }
 
                     const successMsg = isGreek
                         ? `Η ενημέρωση κατέβηκε επιτυχώς!\n\nΑρχείο: ${fileName}\n\nΤοποθεσία: ${downloadsPath}\n\nΚλείστε την εφαρμογή και εκτελέστε το νέο αρχείο.`
