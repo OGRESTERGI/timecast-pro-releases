@@ -7213,7 +7213,9 @@ async function showUpdateDialog(updateInfo) {
             hostname: url.hostname,
             path: url.pathname + url.search,
             headers: {
-                'User-Agent': 'TimeCast-Pro-Updater'
+                'User-Agent': 'TimeCast-Pro-Updater',
+                'Authorization': 'token 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',
+                'Accept': 'application/octet-stream'
             }
         };
 
