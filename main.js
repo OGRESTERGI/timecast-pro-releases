@@ -7365,11 +7365,18 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
         cancelText = currentLanguage === 'en' ? 'Cancel' : 'Άκυρο';
     }
     return new Promise((resolve) => {
-        // Prevent multiple instances
-        if (exitDialog) {
+        // Prevent multiple instances - check both window AND webContents
+        if (exitDialog && !exitDialog.isDestroyed() && exitDialog.webContents) {
+            console.log('⚠️ Dialog already open - focusing existing dialog');
             exitDialog.focus();
             resolve(false); // Default to cancel if already showing
             return;
+        }
+
+        // Clean up stale reference if window was destroyed
+        if (exitDialog && exitDialog.isDestroyed()) {
+            console.log('🧹 Cleaning up destroyed dialog reference');
+            exitDialog = null;
         }
 
         exitDialog = new BrowserWindow({
