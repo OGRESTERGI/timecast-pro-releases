@@ -7170,9 +7170,20 @@ async function showUpdateDialog(updateInfo) {
         let focusTimeout = null;
 
         updateDialog.once('ready-to-show', () => {
+            // Check if dialog still exists before showing
+            if (!updateDialog || updateDialog.isDestroyed()) {
+                console.log('⚠️ updateDialog destroyed before ready-to-show');
+                return;
+            }
+
             updateDialog.show();
 
-            // Send dialog data
+            // Send dialog data - check webContents exists
+            if (!updateDialog.webContents) {
+                console.log('⚠️ updateDialog webContents not available');
+                return;
+            }
+
             const dialogData = {
                 title: isGreek ? 'Νέα Έκδοση Διαθέσιμη!' : 'New Version Available!',
                 currentLabel: isGreek ? 'Τρέχουσα έκδοση:' : 'Current version:',
@@ -7448,6 +7459,18 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
         exitDialog.loadFile('simple-confirm-dialog.html');
 
         exitDialog.once('ready-to-show', () => {
+            // Check if dialog still exists before showing
+            if (!exitDialog || exitDialog.isDestroyed()) {
+                console.log('[EXIT DIALOG] Dialog destroyed before ready-to-show');
+                return;
+            }
+
+            // Check webContents exists before sending
+            if (!exitDialog.webContents) {
+                console.log('[EXIT DIALOG] webContents not available');
+                return;
+            }
+
             // Send message data to dialog
             exitDialog.webContents.send('set-dialog-message', { title, message, confirmText, cancelText });
             exitDialog.show();
