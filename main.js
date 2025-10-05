@@ -4735,7 +4735,17 @@ function createSplashWindow() {
     });
 
     splashWindow.loadFile('splash.html');
-    
+
+    // Inject version after splash loads
+    splashWindow.webContents.on('did-finish-load', () => {
+        const version = app.getVersion();
+        splashWindow.webContents.executeJavaScript(`
+            document.getElementById('app-version').textContent = 'v${version}';
+        `).catch(err => {
+            console.log('⚠️ Could not inject version into splash:', err.message);
+        });
+    });
+
     // Center splash window
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const x = Math.round((width - 400) / 2);
