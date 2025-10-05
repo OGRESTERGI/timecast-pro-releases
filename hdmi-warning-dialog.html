@@ -147,12 +147,51 @@
 
     <script>
         const { ipcRenderer } = require('electron');
+        const i18next = require('i18next');
+        const Backend = require('i18next-fs-backend');
+        const path = require('path');
+        const fs = require('fs');
+
         let countdownInterval = null;
         let secondsLeft = 3;
 
+        // Initialize i18next
+        async function initI18next() {
+            try {
+                let savedLanguage = 'el';
+                try {
+                    const configPath = path.join(__dirname, 'language-config.json');
+                    if (fs.existsSync(configPath)) {
+                        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+                        savedLanguage = config.language || 'el';
+                    }
+                } catch (e) {
+                    console.log('Using default language: el');
+                }
+
+                await i18next.use(Backend).init({
+                    lng: savedLanguage,
+                    fallbackLng: 'el',
+                    supportedLngs: ['el', 'en'],
+                    ns: ['admin'],
+                    defaultNS: 'admin',
+                    backend: {
+                        loadPath: path.join(__dirname, 'locales', '{{lng}}', '{{ns}}.json')
+                    }
+                });
+
+                console.log('✅ i18next initialized in HDMI dialog - Language:', i18next.language);
+            } catch (error) {
+                console.error('❌ i18next initialization failed:', error);
+            }
+        }
+
         // Λήψη παραμέτρων από την κύρια εφαρμογή
-        ipcRenderer.on('dialog-data', (event, data) => {
+        ipcRenderer.on('dialog-data', async (event, data) => {
             console.log('Received dialog data:', data);
+
+            // Initialize translations first
+            await initI18next();
 
             if (data.title) {
                 document.getElementById('dialog-title').textContent = data.title;
@@ -183,14 +222,20 @@
             if (data.autoCloseTimeout) {
                 const countdownDiv = document.getElementById('countdown-timer');
                 const countdownSpan = document.getElementById('countdown-seconds');
+
+                // Update countdown text με i18n
+                const autoCloseMsg = i18next.t('hdmiDialog.autoCloseMessage', 'Αυτόματο κλείσιμο σε');
+                const secondsText = i18next.t('hdmiDialog.autoCloseSeconds', 'δευτερόλεπτα...');
+                countdownDiv.innerHTML = `${autoCloseMsg} <span id="countdown-seconds">3</span> ${secondsText}`;
+
                 countdownDiv.style.display = 'block';
 
                 secondsLeft = Math.ceil(data.autoCloseTimeout / 1000);
-                countdownSpan.textContent = secondsLeft;
+                document.getElementById('countdown-seconds').textContent = secondsLeft;
 
                 countdownInterval = setInterval(() => {
                     secondsLeft--;
-                    countdownSpan.textContent = secondsLeft;
+                    document.getElementById('countdown-seconds').textContent = secondsLeft;
 
                     if (secondsLeft <= 0) {
                         clearInterval(countdownInterval);
