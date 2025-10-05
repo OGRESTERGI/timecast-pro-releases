@@ -7238,6 +7238,7 @@ async function showUpdateDialog(updateInfo) {
         console.log('📥 Starting silent download...');
         console.log(`   URL: ${updateInfo.downloadUrl}`);
         console.log(`   Save to: ${savePath}`);
+        console.log(`   v6.8.5: Testing API URL download fix for private repos`);
 
         // Show downloading message
         const downloadingMsg = isGreek
