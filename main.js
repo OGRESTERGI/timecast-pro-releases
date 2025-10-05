@@ -7166,6 +7166,9 @@ async function showUpdateDialog(updateInfo) {
 
         updateDialog.loadFile('update-dialog.html');
 
+        // Store timeout ID for cleanup
+        let focusTimeout = null;
+
         updateDialog.once('ready-to-show', () => {
             updateDialog.show();
 
@@ -7186,15 +7189,33 @@ async function showUpdateDialog(updateInfo) {
             };
 
             updateDialog.webContents.send('update-dialog-data', dialogData);
+
+            // Focus after delay
+            focusTimeout = setTimeout(() => {
+                if (updateDialog && !updateDialog.isDestroyed() && updateDialog.webContents) {
+                    updateDialog.focus();
+                    updateDialog.webContents.focus();
+                }
+            }, 100);
         });
 
         // Handle response
         ipcMain.once('update-dialog-response', (event, shouldDownload) => {
+            // Clear timeout before closing
+            if (focusTimeout) {
+                clearTimeout(focusTimeout);
+                focusTimeout = null;
+            }
             updateDialog.close();
             resolve(shouldDownload);
         });
 
         updateDialog.on('closed', () => {
+            // Clear timeout if dialog closed unexpectedly
+            if (focusTimeout) {
+                clearTimeout(focusTimeout);
+                focusTimeout = null;
+            }
             resolve(false);
         });
     }).then(shouldDownload => {
@@ -7379,6 +7400,9 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
             exitDialog = null;
         }
 
+        // Store timeout ID for cleanup
+        let dialogFocusTimeout = null;
+
         exitDialog = new BrowserWindow({
             width: 420,
             height: 220,
@@ -7438,8 +7462,8 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
                 }
             });
             
-            // Additional focus after a short delay
-            setTimeout(() => {
+            // Additional focus after a short delay - store timeout ID
+            dialogFocusTimeout = setTimeout(() => {
                 if (exitDialog && !exitDialog.isDestroyed() && exitDialog.webContents) {
                     exitDialog.focus();
                     exitDialog.webContents.focus();
@@ -7455,10 +7479,16 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
 
         // Handle response from dialog
         const responseHandler = (event, shouldConfirm) => {
+            // Clear timeout before closing
+            if (dialogFocusTimeout) {
+                clearTimeout(dialogFocusTimeout);
+                dialogFocusTimeout = null;
+            }
+
             // Unregister global shortcut
             const { globalShortcut } = require('electron');
             globalShortcut.unregister('Escape');
-            
+
             if (exitDialog) {
                 exitDialog.close();
             }
@@ -7470,10 +7500,16 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
         ipcMain.on('simple-confirm-response', responseHandler);
 
         exitDialog.on('closed', () => {
+            // Clear timeout if dialog closed unexpectedly
+            if (dialogFocusTimeout) {
+                clearTimeout(dialogFocusTimeout);
+                dialogFocusTimeout = null;
+            }
+
             // Unregister global shortcut if dialog closed unexpectedly
             const { globalShortcut } = require('electron');
             globalShortcut.unregister('Escape');
-            
+
             exitDialog = null;
             // If dialog closed without response, default to cancel
             ipcMain.removeListener('simple-confirm-response', responseHandler);
