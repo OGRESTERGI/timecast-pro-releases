@@ -1,33 +1,23 @@
-# TimeCast™ Pro
+# TimeCast™ Pro - Official Releases
 
 **Professional Conference Timer System**
-
 by Sovereign Event Systems
 
 ---
 
-## Overview
+## Official Downloads
 
-TimeCast Pro is a professional-grade conference timer application designed for live events, conferences, and presentations. Built for reliability and precision timing.
+TimeCast Pro releases are available exclusively for licensed customers.
 
-## Features
+**Customer Portal**: [https://timecast.eu/account/dashboard.php](https://timecast.eu/account/dashboard.php)
 
-- **Real-time countdown timer** with visual alerts
-- **Multi-device synchronization** via network
-- **HDMI/DisplayPort output** for second screen display
-- **Event timeline management** with markers
-- **Q&A question system** with auto-timer
-- **Google Sheets integration** for event planning
-- **vMix professional integration** for live production
-- **Excel/PDF export** for reports
-- **Clock mode** for current time display
-- **Bilingual interface** (Greek/English)
+---
 
-## Download
+## Latest Release
 
-Official downloads are available exclusively for licensed customers at:
+Check the [Releases](https://github.com/OGRESTERGI/timecast-pro-releases/releases) page for the latest version.
 
-**[https://timecast.eu/account/dashboard.php](https://timecast.eu/account/dashboard.php)**
+---
 
 ## System Requirements
 
@@ -36,11 +26,15 @@ Official downloads are available exclusively for licensed customers at:
 - Internet connection for updates and sync features
 - Optional: Second display for HDMI output
 
+---
+
 ## Licensing
 
 TimeCast Pro is proprietary software. A valid license is required for use.
 
 For licensing inquiries, visit: **[www.sovereign.gr](https://www.sovereign.gr)**
+
+---
 
 ## Support
 
