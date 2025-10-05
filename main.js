@@ -7405,6 +7405,12 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
         exitDialog.webContents.on('before-input-event', (event, input) => {
             console.log(`[EXIT DIALOG] Native input event: ${input.key}, type: ${input.type}`);
             if (input.type === 'keyDown') {
+                // Check if dialog still exists before sending messages
+                if (!exitDialog || exitDialog.isDestroyed() || !exitDialog.webContents) {
+                    console.log('[EXIT DIALOG] Dialog destroyed, ignoring input');
+                    return;
+                }
+
                 if (input.key === 'Escape') {
                     console.log('[EXIT DIALOG] Native ESC detected - canceling');
                     exitDialog.webContents.send('force-cancel');
@@ -7427,14 +7433,14 @@ function showSimpleConfirmDialog(title = 'TimeCast™ Pro', message = null, conf
             const { globalShortcut } = require('electron');
             globalShortcut.register('Escape', () => {
                 console.log('[EXIT DIALOG] Global ESC shortcut triggered');
-                if (exitDialog) {
+                if (exitDialog && !exitDialog.isDestroyed() && exitDialog.webContents) {
                     exitDialog.webContents.send('force-cancel');
                 }
             });
             
             // Additional focus after a short delay
             setTimeout(() => {
-                if (exitDialog) {
+                if (exitDialog && !exitDialog.isDestroyed() && exitDialog.webContents) {
                     exitDialog.focus();
                     exitDialog.webContents.focus();
                 }
