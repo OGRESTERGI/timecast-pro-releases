@@ -6759,7 +6759,8 @@ app.on('before-quit', async (event) => {
         event.preventDefault(); // Σταματά το quit μέχρι να τελειώσει το auto-save
         console.log('🔥 before-quit: Triggering final auto-save...');
         
-        if (mainWindow && !mainWindow.isDestroyed()) {
+        // Check if mainWindow exists AND webContents is available
+        if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
             try {
                 const result = await mainWindow.webContents.executeJavaScript(`
                     (async () => {
@@ -6785,8 +6786,10 @@ app.on('before-quit', async (event) => {
                     console.log('Auto-save before quit: FAILED -', result.message);
                 }
             } catch (error) {
-                console.log('Final auto-save failed: Script failed to execute, this normally means an error was thrown. Check the renderer console for the error.');
+                console.log('Final auto-save skipped: Window already closed or destroyed');
             }
+        } else {
+            console.log('Final auto-save skipped: mainWindow not available');
         }
 
         // Τώρα μπορεί να κλείσει η εφαρμογή
