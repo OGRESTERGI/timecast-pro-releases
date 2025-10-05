@@ -7275,6 +7275,7 @@ async function showUpdateDialog(updateInfo) {
                     path: redirectUrl.pathname + redirectUrl.search,
                     headers: {
                         'User-Agent': 'TimeCast-Pro-Updater',
+                        'Authorization': 'token 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',
                         'Accept': 'application/octet-stream'
                     }
                 };
