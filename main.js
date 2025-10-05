@@ -7235,10 +7235,10 @@ async function showUpdateDialog(updateInfo) {
         const fileName = `TimeCast-Pro-v${updateInfo.latestVersion}.exe`;
         const savePath = path.join(downloadsPath, fileName);
 
-        console.log('📥 Starting silent download...');
+        console.log('📥 Starting fast CDN download...');
         console.log(`   URL: ${updateInfo.downloadUrl}`);
         console.log(`   Save to: ${savePath}`);
-        console.log(`   v6.8.5: Testing API URL download fix for private repos`);
+        console.log(`   v6.9.1: Public releases repo - Fast Google Cloud CDN`);
 
         // Show downloading message
         const downloadingMsg = isGreek
