@@ -7185,8 +7185,70 @@ async function showUpdateDialog(updateInfo) {
     const shouldDownload = await showSimpleConfirmDialog(title, message, downloadBtn, laterBtn);
 
     if (shouldDownload) {
-        // Open download URL in browser
-        shell.openExternal(updateInfo.downloadUrl);
+        // Direct download χωρίς browser
+        const downloadsPath = app.getPath('downloads');
+        const fileName = `TimeCast-Pro-v${updateInfo.latestVersion}.exe`;
+        const savePath = path.join(downloadsPath, fileName);
+
+        console.log('📥 Starting download...');
+        console.log(`   URL: ${updateInfo.downloadUrl}`);
+        console.log(`   Save to: ${savePath}`);
+
+        try {
+            // Use Electron's download API
+            mainWindow.webContents.downloadURL(updateInfo.downloadUrl);
+
+            // Handle download completion
+            mainWindow.webContents.session.once('will-download', (event, item, webContents) => {
+                // Set save path
+                item.setSavePath(savePath);
+
+                item.on('updated', (event, state) => {
+                    if (state === 'interrupted') {
+                        console.error('❌ Download interrupted');
+                    } else if (state === 'progressing') {
+                        if (item.isPaused()) {
+                            console.log('⏸️  Download paused');
+                        } else {
+                            const percent = Math.round((item.getReceivedBytes() / item.getTotalBytes()) * 100);
+                            console.log(`📥 Downloading: ${percent}%`);
+                        }
+                    }
+                });
+
+                item.once('done', (event, state) => {
+                    if (state === 'completed') {
+                        console.log('✅ Download completed!');
+                        const successMsg = isGreek
+                            ? `Η ενημέρωση κατέβηκε επιτυχώς!\n\nΑρχείο: ${fileName}\n\nΤοποθεσία: ${downloadsPath}\n\nΚλείστε την εφαρμογή και εκτελέστε το νέο αρχείο.`
+                            : `Update downloaded successfully!\n\nFile: ${fileName}\n\nLocation: ${downloadsPath}\n\nClose the app and run the new file.`;
+
+                        showCustomDialog(
+                            isGreek ? 'Λήψη Ολοκληρώθηκε' : 'Download Complete',
+                            successMsg,
+                            'info'
+                        );
+
+                        // Open downloads folder
+                        shell.showItemInFolder(savePath);
+                    } else {
+                        console.error(`❌ Download failed: ${state}`);
+                        const errorMsg = isGreek
+                            ? 'Η λήψη απέτυχε. Δοκιμάστε ξανά αργότερα.'
+                            : 'Download failed. Please try again later.';
+                        showCustomDialog(
+                            isGreek ? 'Σφάλμα Λήψης' : 'Download Error',
+                            errorMsg,
+                            'info'
+                        );
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('❌ Download error:', error);
+            // Fallback: Open browser
+            shell.openExternal(updateInfo.downloadUrl);
+        }
     }
 }
 
