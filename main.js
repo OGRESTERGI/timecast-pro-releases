@@ -7258,9 +7258,8 @@ async function showUpdateDialog(updateInfo) {
             hostname: url.hostname,
             path: url.pathname + url.search,
             headers: {
-                'User-Agent': 'TimeCast-Pro-Updater',
-                'Authorization': 'token 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',
-                'Accept': 'application/octet-stream'
+                'User-Agent': 'TimeCast-Pro-Updater'
+                // No Authorization needed - using public releases repo!
             }
         };
 
@@ -7277,9 +7276,8 @@ async function showUpdateDialog(updateInfo) {
                     hostname: redirectUrl.hostname,
                     path: redirectUrl.pathname + redirectUrl.search,
                     headers: {
-                        'User-Agent': 'TimeCast-Pro-Updater',
-                        'Authorization': 'token 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',
-                        'Accept': 'application/octet-stream'
+                        'User-Agent': 'TimeCast-Pro-Updater'
+                        // No Authorization needed - public CDN download!
                     }
                 };
                 https.get(redirectOptions, (redirectResponse) => {

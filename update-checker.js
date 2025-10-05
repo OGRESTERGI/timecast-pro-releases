@@ -10,13 +10,12 @@ const { app } = require('electron');
 class UpdateChecker {
     constructor() {
         this.currentVersion = app.getVersion(); // από package.json
-        this.githubRepo = 'OGRESTERGI/timecast-pro';
+        this.githubRepo = 'OGRESTERGI/timecast-pro-releases'; // Public releases repo
         this.checkInterval = 6 * 60 * 60 * 1000; // Check κάθε 6 ώρες
         this.lastCheck = null;
         this.updateAvailable = false;
         this.latestRelease = null;
-        // GitHub Personal Access Token για private repo access
-        this.githubToken = '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';
+        // No token needed for public repo!
     }
 
     /**
@@ -31,8 +30,8 @@ class UpdateChecker {
                 method: 'GET',
                 headers: {
                     'User-Agent': `TimeCast-Pro/${this.currentVersion}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Authorization': `token ${this.githubToken}`
+                    'Accept': 'application/vnd.github.v3+json'
+                    // No Authorization needed for public repos!
                 },
                 timeout: 10000 // 10 second timeout
             };
@@ -136,9 +135,9 @@ class UpdateChecker {
                                 asset.name.endsWith('.exe')
                             );
 
-                            // Use API URL για private repos (με token authentication)
-                            const downloadUrl = exeAsset ? exeAsset.url : release.html_url;
-                            console.log(`   Download URL (API): ${downloadUrl}`);
+                            // Use browser_download_url for public repos (fast CDN download!)
+                            const downloadUrl = exeAsset ? exeAsset.browser_download_url : release.html_url;
+                            console.log(`   Download URL (CDN): ${downloadUrl}`);
 
                             resolve({
                                 updateAvailable: true,
