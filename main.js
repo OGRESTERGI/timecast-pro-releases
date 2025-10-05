@@ -7185,40 +7185,61 @@ async function showUpdateDialog(updateInfo) {
     const shouldDownload = await showSimpleConfirmDialog(title, message, downloadBtn, laterBtn);
 
     if (shouldDownload) {
-        // Direct download χωρίς browser
+        // Silent background download με https module
+        const https = require('https');
         const downloadsPath = app.getPath('downloads');
         const fileName = `TimeCast-Pro-v${updateInfo.latestVersion}.exe`;
         const savePath = path.join(downloadsPath, fileName);
 
-        console.log('📥 Starting download...');
+        console.log('📥 Starting silent download...');
         console.log(`   URL: ${updateInfo.downloadUrl}`);
         console.log(`   Save to: ${savePath}`);
 
-        try {
-            // Use Electron's download API
-            mainWindow.webContents.downloadURL(updateInfo.downloadUrl);
+        // Show downloading message
+        const downloadingMsg = isGreek
+            ? `Κατέβασμα ενημέρωσης v${updateInfo.latestVersion}...\n\nΠαρακαλώ περιμένετε...`
+            : `Downloading update v${updateInfo.latestVersion}...\n\nPlease wait...`;
 
-            // Handle download completion
-            mainWindow.webContents.session.once('will-download', (event, item, webContents) => {
-                // Set save path
-                item.setSavePath(savePath);
+        showCustomDialog(
+            isGreek ? 'Λήψη σε εξέλιξη...' : 'Downloading...',
+            downloadingMsg,
+            'info'
+        );
 
-                item.on('updated', (event, state) => {
-                    if (state === 'interrupted') {
-                        console.error('❌ Download interrupted');
-                    } else if (state === 'progressing') {
-                        if (item.isPaused()) {
-                            console.log('⏸️  Download paused');
-                        } else {
-                            const percent = Math.round((item.getReceivedBytes() / item.getTotalBytes()) * 100);
-                            console.log(`📥 Downloading: ${percent}%`);
-                        }
-                    }
-                });
+        // Parse download URL
+        const url = new URL(updateInfo.downloadUrl);
 
-                item.once('done', (event, state) => {
-                    if (state === 'completed') {
+        const options = {
+            hostname: url.hostname,
+            path: url.pathname + url.search,
+            headers: {
+                'User-Agent': 'TimeCast-Pro-Updater'
+            }
+        };
+
+        const file = fs.createWriteStream(savePath);
+        let downloadedBytes = 0;
+        let totalBytes = 0;
+
+        https.get(options, (response) => {
+            // Handle redirects
+            if (response.statusCode === 302 || response.statusCode === 301) {
+                console.log('🔄 Following redirect...');
+                https.get(response.headers.location, (redirectResponse) => {
+                    totalBytes = parseInt(redirectResponse.headers['content-length'], 10);
+
+                    redirectResponse.on('data', (chunk) => {
+                        downloadedBytes += chunk.length;
+                        const percent = Math.round((downloadedBytes / totalBytes) * 100);
+                        console.log(`📥 Downloading: ${percent}%`);
+                    });
+
+                    redirectResponse.pipe(file);
+
+                    file.on('finish', () => {
+                        file.close();
                         console.log('✅ Download completed!');
+
                         const successMsg = isGreek
                             ? `Η ενημέρωση κατέβηκε επιτυχώς!\n\nΑρχείο: ${fileName}\n\nΤοποθεσία: ${downloadsPath}\n\nΚλείστε την εφαρμογή και εκτελέστε το νέο αρχείο.`
                             : `Update downloaded successfully!\n\nFile: ${fileName}\n\nLocation: ${downloadsPath}\n\nClose the app and run the new file.`;
@@ -7231,24 +7252,60 @@ async function showUpdateDialog(updateInfo) {
 
                         // Open downloads folder
                         shell.showItemInFolder(savePath);
-                    } else {
-                        console.error(`❌ Download failed: ${state}`);
-                        const errorMsg = isGreek
-                            ? 'Η λήψη απέτυχε. Δοκιμάστε ξανά αργότερα.'
-                            : 'Download failed. Please try again later.';
-                        showCustomDialog(
-                            isGreek ? 'Σφάλμα Λήψης' : 'Download Error',
-                            errorMsg,
-                            'info'
-                        );
-                    }
+                    });
+                }).on('error', (err) => {
+                    fs.unlink(savePath, () => {});
+                    console.error('❌ Download error:', err);
+                    const errorMsg = isGreek
+                        ? 'Η λήψη απέτυχε. Δοκιμάστε ξανά αργότερα.'
+                        : 'Download failed. Please try again later.';
+                    showCustomDialog(
+                        isGreek ? 'Σφάλμα Λήψης' : 'Download Error',
+                        errorMsg,
+                        'info'
+                    );
                 });
-            });
-        } catch (error) {
-            console.error('❌ Download error:', error);
-            // Fallback: Open browser
-            shell.openExternal(updateInfo.downloadUrl);
-        }
+            } else {
+                totalBytes = parseInt(response.headers['content-length'], 10);
+
+                response.on('data', (chunk) => {
+                    downloadedBytes += chunk.length;
+                    const percent = Math.round((downloadedBytes / totalBytes) * 100);
+                    console.log(`📥 Downloading: ${percent}%`);
+                });
+
+                response.pipe(file);
+
+                file.on('finish', () => {
+                    file.close();
+                    console.log('✅ Download completed!');
+
+                    const successMsg = isGreek
+                        ? `Η ενημέρωση κατέβηκε επιτυχώς!\n\nΑρχείο: ${fileName}\n\nΤοποθεσία: ${downloadsPath}\n\nΚλείστε την εφαρμογή και εκτελέστε το νέο αρχείο.`
+                        : `Update downloaded successfully!\n\nFile: ${fileName}\n\nLocation: ${downloadsPath}\n\nClose the app and run the new file.`;
+
+                    showCustomDialog(
+                        isGreek ? 'Λήψη Ολοκληρώθηκε' : 'Download Complete',
+                        successMsg,
+                        'info'
+                    );
+
+                    // Open downloads folder
+                    shell.showItemInFolder(savePath);
+                });
+            }
+        }).on('error', (err) => {
+            fs.unlink(savePath, () => {});
+            console.error('❌ Download error:', err);
+            const errorMsg = isGreek
+                ? 'Η λήψη απέτυχε. Δοκιμάστε ξανά αργότερα.'
+                : 'Download failed. Please try again later.';
+            showCustomDialog(
+                isGreek ? 'Σφάλμα Λήψης' : 'Download Error',
+                errorMsg,
+                'info'
+            );
+        });
     }
 }
 
