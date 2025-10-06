@@ -9,13 +9,28 @@ by Sovereign Event Systems
 
 TimeCast Pro releases are available exclusively for licensed customers.
 
-**Customer Portal**: [https://timecast.eu/account/dashboard.php](https://timecast.eu/account/dashboard.php)
+**Download Latest Version**: [https://timecast.eu/account/download.php](https://timecast.eu/account/download.php)
 
 ---
 
 ## Latest Release
 
 Check the [Releases](https://github.com/OGRESTERGI/timecast-pro-releases/releases) page for the latest version.
+
+---
+
+## Customer Portal
+
+Manage your TimeCast Pro license and activations through our Customer Portal:
+
+- **Sign In**: [https://timecast.eu/account/signin.php](https://timecast.eu/account/signin.php)
+  Login to your existing account with email and password
+
+- **Sign Up**: [https://timecast.eu/account/signup.php](https://timecast.eu/account/signup.php)
+  Create a new account to purchase your TimeCast Pro license
+
+- **Dashboard**: [https://timecast.eu/account/dashboard.php](https://timecast.eu/account/dashboard.php)
+  View your licenses, manage machine activations, and download the latest version
 
 ---
 
@@ -32,14 +47,22 @@ Check the [Releases](https://github.com/OGRESTERGI/timecast-pro-releases/release
 
 TimeCast Pro is proprietary software. A valid license is required for use.
 
-For licensing inquiries, visit: **[www.sovereign.gr](https://www.sovereign.gr)**
+**Purchase License**: Visit [https://timecast.eu/account/signup.php](https://timecast.eu/account/signup.php) to get started.
+
+Each license includes:
+- ✅ 10-day trial period
+- ✅ Unlimited event markers
+- ✅ Multi-display support
+- ✅ Google Sheets integration
+- ✅ vMix sync capabilities
+- ✅ Automatic updates
 
 ---
 
 ## Support
 
-- **Website**: [www.sovereign.gr](https://www.sovereign.gr)
-- **Customer Portal**: [timecast.eu/account](https://timecast.eu/account/dashboard.php)
+- **Email**: [support@timecast.eu](mailto:support@timecast.eu)
+- **Customer Portal**: [https://timecast.eu/account/dashboard.php](https://timecast.eu/account/dashboard.php)
 
 ---
 
