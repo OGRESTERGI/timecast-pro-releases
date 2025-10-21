@@ -1,0 +1,45 @@
+# ===================================
+# TimeCast Pro - PUBLIC RELEASES REPO
+# ===================================
+# This repo should contain ONLY .exe files and README.md
+# NO source code should be committed here!
+
+# ALLOW ONLY THESE FILES:
+# - *.exe (executable releases)
+# - README.md (documentation)
+# - .gitignore (this file)
+
+# BLOCK EVERYTHING ELSE BY DEFAULT
+*
+
+# THEN ALLOW SPECIFIC FILES
+!*.exe
+!README.md
+!.gitignore
+
+# BLOCK SOURCE CODE - Extra protection
+*.js
+*.html
+*.css
+*.json
+*.md
+!README.md
+
+# BLOCK NODE MODULES
+node_modules/
+
+# BLOCK BUILD ARTIFACTS
+dist/
+build/
+src/
+
+# BLOCK DEVELOPMENT FILES
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# BLOCK ALL FOLDERS EXCEPT ROOT
+*/
+!*/
