@@ -5,19 +5,36 @@ by Sovereign Event Systems
 
 ---
 
-## 🚀 Latest Version: v6.16.1
+## ⚠️ Important Notice
 
-**Current Release**: TimeCast Pro Conference Timer v6.16.1
-**Release Date**: November 6, 2025
+**This repository does NOT contain source code.**
+
+TimeCast™ Pro is proprietary software. Only compiled executables are available for download through GitHub Releases.
+
+---
+
+## 🚀 Latest Version: v6.17.4
+
+**Current Release**: TimeCast Pro Conference Timer v6.17.4
+**Release Date**: November 17, 2025
 **Download**: [Latest Release](https://github.com/OGRESTERGI/timecast-pro-releases/releases/latest)
 
-### What's New in v6.16.1
-- ✨ Modern plastic 3D button styling με shiny effects
-- 📊 Complete rejected questions statistics
-- 🎨 Enhanced UI με white borders και improved visibility
-- 🐛 Critical bug fixes για font sizing και timeline accuracy
-- 🌐 Improved Greek/English translations
-- 📱 Better responsive layouts για όλα τα screen sizes
+### What's New in v6.17.4
+- 📅 License expiry date displayed in window title bar
+- 📅 License information in Settings → License Management
+- 💡 Yeelight RGB pulse effect during warning state
+- 🐛 Bug fixes and UI improvements
+
+---
+
+## 📥 How to Download
+
+1. Go to [Releases Page](https://github.com/OGRESTERGI/timecast-pro-releases/releases)
+2. Click on the latest version
+3. Under "Assets", download `TimeCast.Pro.ConferenceTimer-vX.X.X.exe`
+4. Run the .exe file (no installation required - portable application)
+
+**Note**: Do NOT download "Source code (zip)" - it does not contain the actual application.
 
 ---
 
@@ -26,12 +43,6 @@ by Sovereign Event Systems
 TimeCast Pro releases are available exclusively for licensed customers.
 
 **Download Latest Version**: [https://timecast.eu/account/download.php](https://timecast.eu/account/download.php)
-
----
-
-## All Releases
-
-View all versions and changelog: [Releases Page](https://github.com/OGRESTERGI/timecast-pro-releases/releases)
 
 ---
 
@@ -100,7 +111,7 @@ TimeCast Pro is proprietary software. A valid license is required for use.
 **Purchase License**: Visit [https://timecast.eu/account/signup.php](https://timecast.eu/account/signup.php) to get started.
 
 Each license includes:
-- ✅ 10-day trial period
+- ✅ 30-day trial period
 - ✅ Unlimited event markers
 - ✅ Multi-display support
 - ✅ Google Sheets integration
