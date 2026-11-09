@@ -89,7 +89,6 @@ Manage your TimeCast Pro license and activations through our Customer Portal:
 - 🔐 Advanced licensing system με trial period
 - 🔄 Automatic updates
 - 💾 Session auto-save με state restoration
-- 🌍 Company name intelligence (ΓΕΜΗ/INSEE APIs)
 - 📝 Comprehensive event logging
 
 ---
